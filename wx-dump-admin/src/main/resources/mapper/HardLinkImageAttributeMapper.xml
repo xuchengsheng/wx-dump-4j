@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.HardLinkImageAttributeMapper">
+
+    <!-- 查询群聊 -->
+    <select id="queryHardLinkImage" resultType="java.lang.String">
+        SELECT
+           '\\FileStorage\MsgAttach\\' || hli1.Dir || '\\' || 'Image' || '\\' || hli2.Dir || '\\' || hlia.FileName
+        FROM
+            HardLinkImageAttribute hlia
+            LEFT JOIN HardLinkImageID hli1 ON hlia.DirID1 = hli1.DirId
+            LEFT JOIN HardLinkImageID hli2 ON hlia.DirID2 = hli2.DirId
+        WHERE
+            hlia.Md5=#{md5} LIMIT 1
+    </select>
+</mapper>

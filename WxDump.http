@@ -1,0 +1,67 @@
+### 查询联系人
+POST http://127.0.0.1:8080/api/queryContact
+Content-Type: application/json
+
+{
+  "current": 1,
+  "pageSize": 10,
+  "remark": "",
+  "nickName": "",
+  "labelId": ""
+}
+
+### 查询联系人标签
+GET http://127.0.0.1:8080/api/contact/list
+Content-Type: application/json
+
+### 导出联系人
+GET http://127.0.0.1:8080/api/contact/export
+Content-Type: application/json
+
+### 查询会话
+GET http://localhost:8080/api/querySession
+Content-Type: application/json
+
+### 查询聊天内容
+GET http://localhost:8080/api/queryMsg?talker=wxid_7hitj8y1ytyq22&localId=174200
+Content-Type: application/json
+
+
+### 查询群聊
+POST http://localhost:8080/api/queryChatRoom
+Content-Type: application/json
+
+{
+  "current": 1,
+  "pageSize": 10,
+  "condition": {}
+}
+
+### 查询群聊详情
+GET http://localhost:8080/api/queryChatRoomDetail?chatRoomName=23444021026@chatroom
+Content-Type: application/json
+
+### 查询朋友圈
+POST http://localhost:8080/api/queryFeeds
+Content-Type: application/json
+
+{
+  "current": 1,
+  "pageSize": 10
+}
+
+### 微信消息类型及其分布统计
+GET http://localhost:8080/api/msgTypeDistribution
+Content-Type: application/json
+
+### 查询关键字
+GET http://localhost:8080/api/queryRecentUsedKeyWord
+Content-Type: application/json
+
+### TOP 10
+GET http://localhost:8080/api/top10ContactsMonthly
+Content-Type: application/json
+
+### TOP 10
+GET http://localhost:8080/api/statsPanel
+Content-Type: application/json

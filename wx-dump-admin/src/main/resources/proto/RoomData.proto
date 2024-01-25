@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_outer_classname = "ChatRoomProto";
+
+message ChatRoom {
+  repeated Member members = 1;
+  int32 field2 = 2;
+  int32 field3 = 3;
+  int32 field4 = 4;
+  int32 roomCapacity = 5;
+  int32 field6 = 6;
+  int64 field7 = 7;
+  int64 field8 = 8;
+}
+
+message Member {
+  string wxId = 1;
+  string remark = 2;
+  int32 state = 3;
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.SessionMapper">
+
+    <!-- 查询会话 -->
+    <select id="querySession" resultType="com.xcs.wx.domain.vo.SessionVO">
+        SELECT
+            s.strUsrName AS userName,
+            s.nTime AS time,
+            s.strContent AS content,
+            chiu.smallHeadImgUrl AS headImgUrl,
+            CASE
+                WHEN c.Remark IS NULL OR c.Remark = '' THEN
+                        CASE WHEN c.NickName IS NULL OR c.NickName = '' THEN s.strNickName  ELSE c.NickName
+                END ELSE c.Remark
+            END AS nickName
+        FROM
+            Session s
+            LEFT JOIN ContactHeadImgUrl chiu ON s.strUsrName = chiu.usrName
+            LEFT JOIN Contact c ON c.UserName = s.strUsrName
+        WHERE
+            strUsrName NOT LIKE '%gh_%'
+            AND nOrder > 1
+            AND nMsgLocalID > 0
+        ORDER BY
+            nTime DESC
+    </select>
+</mapper>

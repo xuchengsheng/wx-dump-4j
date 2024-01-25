@@ -1,0 +1,33 @@
+server:
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        login-username: admin
+        login-password: 123456
+    dynamic:
+      druid:
+        initial-size: 5
+        max-active: 8
+        min-idle: 3
+        max-wait: 1000
+        test-while-idle: false
+wechat-offset:
+  version:
+    "[3.9.8.25]":
+      nickname: 65000920
+      account: 65002256
+      mobile: 65000728
+      key: 65002192
+    "[3.9.9.27]":
+      nickname: 68065304
+      account: 68065080
+      mobile: 68065112
+      key: 68066576
+
+#mybatis-plus:
+  #configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志

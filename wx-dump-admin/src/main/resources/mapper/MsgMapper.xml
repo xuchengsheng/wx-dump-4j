@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.MsgMapper">
+
+    <resultMap id="msgResultMap" type="com.xcs.wx.domain.Msg">
+        <result property="talkerId" column="talkerId" />
+        <result property="msgSvrId" column="msgSvrId" />
+        <result property="type" column="type" />
+        <result property="subType" column="subType" />
+        <result property="isSender" column="isSender" />
+        <result property="createTime" column="createTime" />
+        <result property="sequence" column="sequence" />
+        <result property="statusEx" column="statusEx" />
+        <result property="flagEx" column="flagEx" />
+        <result property="status" column="status" />
+        <result property="msgServerSeq" column="msgServerSeq" />
+        <result property="msgSequence" column="msgSequence" />
+        <result property="strTalker" column="strTalker" />
+        <result property="strContent" column="strContent" />
+        <result property="displayContent" column="displayContent" />
+        <result property="reserved0" column="reserved0" />
+        <result property="reserved1" column="reserved1" />
+        <result property="reserved2" column="reserved2" />
+        <result property="reserved3" column="reserved3" />
+        <result property="reserved4" column="reserved4" />
+        <result property="reserved5" column="reserved5" />
+        <result property="reserved6" column="reserved6" />
+        <result property="bytesExtra" column="bytesExtra" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+        <result property="bytesTrans" column="bytesTrans" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+        <result property="compressContent" column="compressContent" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+    </resultMap>
+
+    <!-- 获得最大的序列号 -->
+    <select id="getNextSequence" resultType="java.lang.Long">
+        SELECT MAX(Sequence) FROM MSG
+    </select>
+
+    <!-- 根据数量与序列号获取消息 -->
+    <select id="queryMsgBySequence" resultMap="msgResultMap">
+        SELECT
+            TalkerId AS talkerId,
+            MsgSvrID AS msgSvrId,
+            Type AS type,
+            SubType AS subType,
+            IsSender AS isSender,
+            CreateTime AS createTime,
+            Sequence AS sequence,
+            StatusEx AS statusEx,
+            FlagEx AS flagEx,
+            Status AS status,
+            MsgServerSeq AS msgServerSeq,
+            MsgSequence AS msgSequence,
+            StrTalker AS strTalker,
+            StrContent AS strContent,
+            DisplayContent AS displayContent,
+            Reserved0 AS reserved0,
+            Reserved1 AS reserved1,
+            Reserved2 AS reserved2,
+            Reserved3 AS reserved3,
+            Reserved4 AS reserved4,
+            Reserved5 AS reserved5,
+            Reserved6 AS reserved6,
+            BytesExtra AS bytesExtra,
+            BytesTrans AS bytesTrans,
+            CompressContent AS compressContent
+        FROM
+            MSG
+        WHERE
+            sequence > #{nextSequence}
+    </select>
+
+    <!-- 微信消息类型及其分布统计 -->
+    <select id="msgTypeDistribution" resultType="com.xcs.wx.domain.vo.MsgTypeDistributionVO">
+        SELECT
+            CASE
+                WHEN Type = 1 AND SubType = 0 THEN '文本'
+                WHEN Type = 3 AND SubType = 0 THEN '图片'
+                WHEN Type = 34 AND SubType = 0 THEN '语音'
+                WHEN Type = 43 AND SubType = 0 THEN '视频'
+                WHEN Type = 47 AND SubType = 0 THEN '动画表情'
+                WHEN Type = 49 AND SubType = 1 THEN '特殊文本消息'
+                WHEN Type = 49 AND SubType = 5 THEN '卡片式链接'
+                WHEN Type = 49 AND SubType = 6 THEN '文件'
+                WHEN Type = 49 AND SubType = 8 THEN 'GIF表情'
+                WHEN Type = 49 AND SubType = 19 THEN '合并转发聊天记录'
+                WHEN Type = 49 AND SubType IN (33, 36) THEN '小程序分享'
+                WHEN Type = 49 AND SubType = 57 THEN '引用消息'
+                WHEN Type = 49 AND SubType = 63 THEN '视频号直播'
+                WHEN Type = 49 AND SubType = 87 THEN '群公告'
+                WHEN Type = 49 AND SubType = 88 THEN '视频号直播'
+                WHEN Type = 49 AND SubType = 2000 THEN '转账消息'
+                WHEN Type = 49 AND SubType = 2003 THEN '红包封面'
+                WHEN Type = 10000 AND SubType = 0 THEN '系统通知'
+                WHEN Type = 10000 AND SubType = 4 THEN '拍一拍'
+                WHEN Type = 10000 AND SubType = 8000 THEN '群聊邀请通知'
+                ELSE '其他类型'
+                END AS type,
+            COUNT(*) as value
+        FROM MSG
+        GROUP BY Type, SubType;
+    </select>
+
+    <!-- 统计过去 15 天每天的发送和接收消息数量 -->
+    <select id="countRecentMsgs" resultType="com.xcs.wx.domain.vo.CountRecentMsgsVO">
+        SELECT
+            strftime( '%m-%d', CreateTime, 'unixepoch', 'localtime' ) AS type,
+            '发送数量' AS category,
+            SUM( CASE WHEN IsSender = 1 THEN 1 ELSE 0 END ) AS value
+        FROM
+            MSG
+        WHERE
+            DATE( CreateTime, 'unixepoch', 'localtime' ) >= DATE( 'now', '-15 days', 'localtime' )
+        GROUP BY
+            strftime( '%Y-%m-%d', CreateTime, 'unixepoch', 'localtime' )
+        UNION ALL
+        SELECT
+            strftime( '%m-%d', CreateTime, 'unixepoch', 'localtime' ) AS type,
+            '接收数量' AS category,
+            SUM( CASE WHEN IsSender = 0 THEN 1 ELSE 0 END ) AS value
+        FROM
+            MSG
+        WHERE
+            DATE( CreateTime, 'unixepoch', 'localtime' ) >= DATE( 'now', '-15 days', 'localtime' )
+        GROUP BY
+            strftime( '%Y-%m-%d', CreateTime, 'unixepoch', 'localtime' )
+        ORDER BY
+            type,
+            category
+    </select>
+
+    <!-- 最近一个月内微信互动最频繁的前10位联系人 -->
+    <select id="topContacts" resultType="com.xcs.wx.domain.vo.TopContactsVO">
+        SELECT
+            StrTalker as userName,
+            COUNT( * ) AS total
+        FROM
+            MSG
+        WHERE
+            StrTalker NOT LIKE '%@chatroom'
+          AND DATE( CreateTime, 'unixepoch', 'localtime' ) >= DATE( 'now', '-1 month', 'localtime' )
+        GROUP BY
+            userName
+        ORDER BY
+            total DESC
+            LIMIT 10;
+    </select>
+
+    <!-- 统计发送消息数量 -->
+    <select id="countSent" resultType="java.lang.Integer">
+        SELECT
+            COALESCE( SUM( CASE WHEN IsSender = 1 THEN 1 ELSE 0 END ), 0 ) AS SentMessages
+        FROM
+            MSG
+        WHERE
+            DATE( CreateTime, 'unixepoch', 'localtime' ) = DATE( 'now', 'localtime' );
+    </select>
+
+    <!-- 统计接受消息数量 -->
+    <select id="countReceived" resultType="java.lang.Integer">
+        SELECT
+            COALESCE( SUM( CASE WHEN IsSender = 0 THEN 1 ELSE 0 END ), 0 ) AS ReceivedMessages
+        FROM
+            MSG
+        WHERE
+            DATE( CreateTime, 'unixepoch', 'localtime' ) = DATE( 'now', 'localtime' );
+    </select>
+
+</mapper>

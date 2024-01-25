@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--suppress SqlResolve -->
+<mapper namespace="com.xcs.wx.mapper.ContactMapper">
+
+    <!-- 查询联系人 -->
+    <select id="queryContact" resultType="com.xcs.wx.domain.vo.ContactVO" parameterType="com.xcs.wx.domain.dto.ContactDTO">
+        SELECT
+            c.UserName as userName,
+            CASE WHEN c.Alias IS NULL OR c.Alias = '' THEN c.UserName ELSE c.Alias END AS alias,
+            c.Remark as remark,
+            c.NickName as nickName,
+            c.LabelIDList as labelIdList,
+            c.Reserved6 as describe,
+            chiu.smallHeadImgUrl as headImgUrl
+        FROM
+            Contact c LEFT JOIN ContactHeadImgUrl chiu ON c.UserName=chiu.usrName
+        WHERE
+            Type % 2 = 1
+            AND VerifyFlag = 0
+            AND UserName NOT IN ( 'floatbottle', 'fmessage', 'medianote','filehelper' )
+            AND UserName NOT LIKE '%@chatroom'
+        <if test="contactDTO.remark != null and contactDTO.remark != ''">
+            AND Remark LIKE '%' || #{contactDTO.remark} || '%'
+        </if>
+        <if test="contactDTO.nickName != null and contactDTO.nickName != ''">
+            AND NickName LIKE '%' || #{contactDTO.nickName} || '%'
+        </if>
+        <if test="contactDTO.labels != null and contactDTO.labels != ''">
+            AND (',' || LabelIDList || ',') LIKE '%' || #{contactDTO.labels} || '%'
+        </if>
+        <if test="contactDTO.describe != null and contactDTO.describe != ''">
+            AND Reserved6 LIKE '%' || #{contactDTO.describe} || '%'
+        </if>
+            ORDER BY COALESCE(NULLIF(RemarkPYInitial, ''), PYInitial)
+    </select>
+
+    <!-- 统计联系人数量 -->
+    <select id="countContact" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            Contact c
+        WHERE
+            Type % 2 = 1
+          AND VerifyFlag = 0
+          AND UserName NOT IN ( 'floatbottle', 'fmessage', 'medianote','filehelper' )
+          AND UserName NOT LIKE '%@chatroom';
+    </select>
+
+    <!-- 导出联系人 -->
+    <select id="exportContact" resultType="com.xcs.wx.domain.vo.ExportContactVO">
+        SELECT
+            c.UserName as userName,
+            CASE WHEN c.Alias IS NULL OR c.Alias = '' THEN c.UserName ELSE c.Alias END AS alias,
+            c.Remark as remark,
+            c.NickName as nickName,
+            c.LabelIDList as labelIdList,
+            c.Reserved6 as describe
+        FROM
+            Contact c
+        WHERE
+            Type % 2 = 1
+          AND VerifyFlag = 0
+          AND UserName NOT IN ( 'floatbottle', 'fmessage', 'medianote','filehelper' )
+          AND UserName NOT LIKE '%@chatroom'
+    </select>
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.ChatRoomMapper">
+
+    <resultMap id="chatRoomResultMap" type="com.xcs.wx.domain.vo.ChatRoomVO">
+        <result property="chatRoomName" column="chatRoomName" />
+        <result property="isShowName" column="isShowName" />
+        <result property="selfDisplayName" column="selfDisplayName" />
+        <result property="roomData" column="roomData" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+        <result property="chatRoomTitle" column="chatRoomTitle" />
+        <result property="createBy" column="createBy" />
+        <result property="headImgUrl" column="headImgUrl" />
+        <result property="enterprise" column="enterprise" />
+        <result property="dissolution" column="dissolution" />
+    </resultMap>
+
+    <resultMap id="exportChatRoomResultMap" type="com.xcs.wx.domain.vo.ExportChatRoomVO">
+        <result property="chatRoomName" column="chatRoomName" />
+        <result property="selfDisplayName" column="selfDisplayName" />
+        <result property="roomData" column="roomData" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+        <result property="chatRoomTitle" column="chatRoomTitle" />
+        <result property="createBy" column="createBy" />
+        <result property="enterprise" column="enterprise" />
+        <result property="dissolution" column="dissolution" />
+    </resultMap>
+
+    <!-- 查询群聊 -->
+    <select id="queryChatRoom" resultMap="chatRoomResultMap" parameterType="com.xcs.wx.domain.dto.ChatRoomDTO">
+        SELECT
+            cr.ChatRoomName as chatRoomName,
+            cr.IsShowName as isShowName,
+            cr.SelfDisplayName as selfDisplayName,
+            cr.RoomData as roomData,
+            c.NickName as chatRoomTitle,
+            c1.NickName as createBy,
+            chiu.smallHeadImgUrl as headImgUrl,
+            CASE WHEN cr.Reserved2 LIKE '%@openim' THEN 1 ELSE 0 END as enterprise,
+            CASE WHEN cr.Reserved2 = '' THEN 1 ELSE 0 END as dissolution
+        FROM
+            ChatRoom cr
+            LEFT JOIN Contact c ON cr.ChatRoomName = c.UserName
+            LEFT JOIN Contact c1 ON cr.Reserved2 = c1.UserName
+            LEFT JOIN ContactHeadImgUrl chiu ON cr.ChatRoomName = chiu.usrName
+        WHERE
+            cr.ChatRoomName != ''
+        <if test="chatRoomDTO.chatRoomTitle != null and chatRoomDTO.chatRoomTitle != ''">
+            AND c.NickName like '%' || #{chatRoomDTO.chatRoomTitle} || '%'
+        </if>
+        <if test="chatRoomDTO.selfDisplayName != null and chatRoomDTO.selfDisplayName != ''">
+            AND cr.SelfDisplayName like '%' || #{chatRoomDTO.selfDisplayName} || '%'
+        </if>
+        <if test="chatRoomDTO.createBy != null and chatRoomDTO.createBy != ''">
+            AND c1.NickName like '%' || #{chatRoomDTO.createBy} || '%'
+        </if>
+    </select>
+
+    <!-- 统计群聊数量 -->
+    <select id="countChatRoom" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            ChatRoom
+        WHERE
+            ChatRoomName != ''
+    </select>
+
+    <!-- 导出群聊 -->
+    <select id="exportChatRoom" resultMap="exportChatRoomResultMap">
+        SELECT
+            cr.ChatRoomName as chatRoomName,
+            cr.SelfDisplayName as selfDisplayName,
+            cr.RoomData as roomData,
+            c.NickName as chatRoomTitle,
+            c1.NickName as createBy,
+            CASE WHEN cr.Reserved2 LIKE '%@openim' THEN 1 ELSE 0 END as enterprise,
+            CASE WHEN cr.Reserved2 = '' THEN 1 ELSE 0 END as dissolution
+        FROM
+            ChatRoom cr
+            LEFT JOIN Contact c ON cr.ChatRoomName = c.UserName
+            LEFT JOIN Contact c1 ON cr.Reserved2 = c1.UserName
+        WHERE
+            cr.ChatRoomName != ''
+    </select>
+
+</mapper>
