@@ -19,7 +19,7 @@ import java.util.List;
  **/
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/msg")
+@RequestMapping("/api/msg")
 public class MsgController {
 
     private final MsgService msgService;

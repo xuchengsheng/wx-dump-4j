@@ -33,6 +33,11 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <version>3.5.0</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.basedir}/src/main/assembly/binary.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>admin-bin</id>
@@ -42,12 +47,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.basedir}/src/main/assembly/binary.xml</descriptor>
-                            </descriptors>
-                            <tarLongFileMode>posix</tarLongFileMode>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

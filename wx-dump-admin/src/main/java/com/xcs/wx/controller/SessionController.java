@@ -18,7 +18,7 @@ import java.util.List;
  **/
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/session")
+@RequestMapping("/api/session")
 public class SessionController {
 
     private final SessionService sessionService;

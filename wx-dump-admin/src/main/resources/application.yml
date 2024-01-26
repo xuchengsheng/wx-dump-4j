@@ -1,6 +1,3 @@
-server:
-  servlet:
-    context-path: /api
 spring:
   datasource:
     druid:
@@ -27,7 +24,3 @@ wechat-offset:
       account: 68065080
       mobile: 68065112
       key: 68066576
-
-#mybatis-plus:
-  #configuration:
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志

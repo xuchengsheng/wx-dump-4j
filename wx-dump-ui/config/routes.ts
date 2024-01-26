@@ -12,21 +12,9 @@
  */
 export default [
   {
-    path: '/user',
-    layout: false,
-    routes: [
-      {
-        name: 'login',
-        path: '/user/login',
-        component: './User/Login',
-      },
-    ],
-  },
-  {
     path: '/dashboard',
     name: '数据分析',
     icon: 'dashboard',
-    access: 'canAdmin',
     routes: [
       {
         path: '/dashboard/wechat',
@@ -40,7 +28,6 @@ export default [
     path: '/wechat',
     name: '微信管理',
     icon: 'wechat',
-    access: 'canAdmin',
     routes: [
       {
         path: '/wechat/session',

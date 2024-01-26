@@ -11,6 +11,7 @@ import com.xcs.wx.config.WeChatOffsetProperties;
 import com.xcs.wx.domain.vo.WeChatVO;
 import com.xcs.wx.exception.BizException;
 import com.xcs.wx.service.WeChatService;
+import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -92,7 +93,11 @@ public class WeChatServiceImpl implements WeChatService {
         // 获取微信Id
         String wxId = getWxId(basePath);
         // 返回配置信息
-        return new WeChatVO(pid, baseAddress, version, nickname, account, mobile, key, basePath, wxId);
+        WeChatVO weChatVO = new WeChatVO(pid, baseAddress, version, nickname, account, mobile, key, basePath, wxId);
+        // 保存用户信息
+        UserUtil.saveUser(weChatVO);
+        // 返回
+        return weChatVO;
     }
 
     /**

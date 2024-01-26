@@ -10,11 +10,17 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wx-dump-admin</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.7.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <version>2.7.15</version>
         </dependency>
         <dependency>
@@ -98,5 +104,21 @@
             <version>2.13.5</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>wx-dump-admin</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>

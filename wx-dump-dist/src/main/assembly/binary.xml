@@ -7,32 +7,15 @@
         <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>${project.build.finalName}-admin-bin</baseDirectory>
+    <baseDirectory>${project.build.finalName}-bin</baseDirectory>
 
     <fileSets>
         <fileSet>
-            <directory>src/main/resources</directory>
-            <lineEnding>unix</lineEnding>
+            <directory>../wx-dump-ui/dist</directory>
+            <outputDirectory>/html</outputDirectory>
             <includes>
-                <include>*.xml</include>
+                <include>**/*</include>
             </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/wx-dump-admin/src/main/resources</directory>
-            <includes>
-                <include>*.yml</include>
-            </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>src/main/resources/bin</directory>
-            <lineEnding>unix</lineEnding>
-            <includes>
-                <include>*.sh</include>
-            </includes>
-            <outputDirectory>bin</outputDirectory>
-            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <directory>src/main/resources/bin</directory>
@@ -43,17 +26,15 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
         </fileSet>
-        <fileSet>
-            <outputDirectory>ext-lib</outputDirectory>
-            <excludes>
-                <exclude>**/*</exclude>
-            </excludes>
-        </fileSet>
     </fileSets>
+
+    <!-- 包括项目依赖 -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
-            <fileMode>0644</fileMode>
+            <outputDirectory>/lib</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
+
 </assembly>

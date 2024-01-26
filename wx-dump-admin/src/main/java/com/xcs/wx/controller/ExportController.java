@@ -24,7 +24,7 @@ import java.nio.file.Paths;
  **/
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/export")
+@RequestMapping("/api/export")
 public class ExportController {
 
     /**

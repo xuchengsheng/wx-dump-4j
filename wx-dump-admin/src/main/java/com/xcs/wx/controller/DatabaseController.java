@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/database")
+@RequestMapping("/api/database")
 public class DatabaseController {
 
     private final DatabaseService databaseService;
