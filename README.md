@@ -41,7 +41,9 @@
     <img src="https://img.shields.io/badge/Spring-5.3.10-%23437291?logo=Spring&logoColor=%236DB33F&color=%236DB33F"/>
     <img src="https://img.shields.io/badge/SpringBoot-2.5.5-%23437291?logo=SpringBoot&logoColor=%236DB33F&color=%236DB33F"/>
 </div>
+
 ## 👋功能
+
 + 获取当前登录微信的微信昵称、账号、手机号、邮箱、秘钥、微信Id、文件夹路径
 + 将微信PC的多个聊天记录数据库合并为单一数据库文件
 + 支持微信聊天对话窗口（文本消息，引用消息，图片消息，表情消息，卡片链接消息，系统消息，等）
