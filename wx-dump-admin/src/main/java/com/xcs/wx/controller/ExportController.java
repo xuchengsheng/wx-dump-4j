@@ -1,6 +1,7 @@
 package com.xcs.wx.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -33,9 +34,14 @@ public class ExportController {
     @GetMapping("download")
     public ResponseEntity<Resource> download(@RequestParam String path) throws IOException {
         Path filePath = Paths.get(path);
-        Resource resource = new UrlResource(filePath.toUri());
+        Resource resource = new FileSystemResource(filePath.toFile());
 
-        String encodedFilename = URLEncoder.encode(resource.getFilename(), StandardCharsets.UTF_8).replace("+", "%20");
+        // 处理文件不存在的情况
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String encodedFilename = URLEncoder.encode(resource.getFilename(), StandardCharsets.UTF_8.name()).replace("+", "%20");
         String contentDisposition = "attachment; filename*=UTF-8''" + encodedFilename;
 
         return ResponseEntity.ok()

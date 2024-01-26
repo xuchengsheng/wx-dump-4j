@@ -48,12 +48,10 @@ public class MsgServiceImpl implements MsgService {
                 .map(msgs -> {
                     // 获取用户信息
                     WeChatVO user = UserUtil.getUser();
-                    // 参数转换
-                    List<MsgVO> msgVOList = msgMapping.convert(msgs);
                     // 根据时间排序
-                    msgVOList.stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
+                    return msgMapping.convert(msgs).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
                             // 遍历数据
-                            .forEach(msgVO -> {
+                            .peek(msgVO -> {
                                 msgVO.setWxId(getChatWxId(talker, msgVO, user));
                                 // 设置处理日期
                                 msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
@@ -65,8 +63,7 @@ public class MsgServiceImpl implements MsgService {
                                 if (strategy != null) {
                                     strategy.process(msgVO);
                                 }
-                            });
-                    return msgVOList;
+                            }).collect(Collectors.toList());
                 })
                 // 设置默认值
                 .orElse(Collections.emptyList());
@@ -125,30 +122,26 @@ public class MsgServiceImpl implements MsgService {
      * @return wxid
      */
     private String getChatWxId(String talker, MsgVO msgVO, WeChatVO user) {
-        String wxId = null;
         // 我发送的消息
         if (msgVO.getIsSender() == 1) {
-            wxId = user.getWxId();
-        } else {
-            // 我接受的消息
-            try {
-                // 群聊
-                if (talker.endsWith(ChatRoomConstant.CHATROOM_SUFFIX)) {
-                    MsgProto.MessageBytesExtra messageBytesExtra = MsgProto.MessageBytesExtra.parseFrom(msgVO.getBytesExtra());
-                    List<MsgProto.SubMessage2> message2List = messageBytesExtra.getMessage2List();
-                    for (MsgProto.SubMessage2 subMessage2 : message2List) {
-                        if (subMessage2.getField1() == 1) {
-                            wxId = subMessage2.getField2();
-                        }
-                    }
-                } else {
-                    wxId = talker;
-                }
-            } catch (InvalidProtocolBufferException e) {
-                log.error("获取对话人Id失败", e);
-            }
+            return user.getWxId();
         }
-        return wxId;
+        // 我接受的消息
+        try {
+            // 群聊
+            if (talker.endsWith(ChatRoomConstant.CHATROOM_SUFFIX)) {
+                MsgProto.MessageBytesExtra messageBytesExtra = MsgProto.MessageBytesExtra.parseFrom(msgVO.getBytesExtra());
+                List<MsgProto.SubMessage2> message2List = messageBytesExtra.getMessage2List();
+                for (MsgProto.SubMessage2 subMessage2 : message2List) {
+                    if (subMessage2.getField1() == 1) {
+                        return subMessage2.getField2();
+                    }
+                }
+            }
+        } catch (InvalidProtocolBufferException e) {
+            log.error("获取对话人Id失败", e);
+        }
+        return talker;
     }
 
     /**

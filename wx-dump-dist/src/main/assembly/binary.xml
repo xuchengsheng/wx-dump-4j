@@ -2,10 +2,11 @@
     xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>admin-bin</id>
+    <id>bin</id>
     <formats>
         <format>tar.gz</format>
     </formats>
+
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>${project.build.finalName}-bin</baseDirectory>
 
@@ -21,7 +22,7 @@
             <directory>../asset</directory>
             <outputDirectory>/bin/asset</outputDirectory>
             <includes>
-                <include>**/*</include>
+                <include>404.png</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -35,7 +36,6 @@
         </fileSet>
     </fileSets>
 
-    <!-- 包括项目依赖 -->
     <dependencySets>
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
@@ -43,5 +43,4 @@
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
-
 </assembly>
