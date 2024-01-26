@@ -1,5 +1,5 @@
 <div align="center">
-    <img alt="logo" src="image/banner.png" style="height: 80px">
+    <img alt="logo" src="image/logo.png" style="height: 80px">
 </div>
 <div align="center">
     <h2>Java版微信聊天记录备份与管理工具</h2>
@@ -34,20 +34,13 @@
     |
     💻 <a href="#我的-github-统计">统计</a>
 </p>
----
-
 ## ⚡技术
 
 <div align="left">
     <img src="https://img.shields.io/badge/Java-8%2B-%23437291?logo=openjdk&logoColor=%23437291"/>
     <img src="https://img.shields.io/badge/Spring-5.3.10-%23437291?logo=Spring&logoColor=%236DB33F&color=%236DB33F"/>
     <img src="https://img.shields.io/badge/SpringBoot-2.5.5-%23437291?logo=SpringBoot&logoColor=%236DB33F&color=%236DB33F"/>
-    <img src="https://img.shields.io/badge/Maven-3.6.3-%23437291?logo=Apache%20Maven&logoColor=%23C71A36&color=%23C71A36"/>
-    <img src="https://img.shields.io/badge/JSR-330-%2366CCFF?logo=OpenJDK&logoColor=%2366CCFF&color=%2366CCFF"/>
-    <img src="https://img.shields.io/badge/JSR-250-%23FF9900?logo=OpenJDK&logoColor=%23FF9900&color=%23FF9900"/>
 </div>
-
-
 ## 👋功能
 + 获取当前登录微信的微信昵称、账号、手机号、邮箱、秘钥、微信Id、文件夹路径
 + 将微信PC的多个聊天记录数据库合并为单一数据库文件
@@ -84,7 +77,7 @@
 1️⃣ **扫描我的二维码**：使用微信的扫一扫功能，扫描下方的二维码，将我添加为你的好友。
 
 <div>
-<img alt="logo" src="image/wechat-group.jpg" style="width: 344px;height: 483px">
+<img alt="logo" src="image/wechat.jpg" style="width: 344px;height: 483px">
 </div>
 
 2️⃣ **等待好友请求被接受**：一旦你的好友请求被接受，你将收到一份群组邀请。
