@@ -18,6 +18,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../asset</directory>
+            <outputDirectory>/bin/asset</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/resources/bin</directory>
             <lineEnding>windows</lineEnding>
             <includes>
