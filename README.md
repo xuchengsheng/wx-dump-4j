@@ -39,15 +39,25 @@
 ## 👋功能
 
 + 获取当前登录微信的微信昵称、账号、手机号、邮箱、秘钥、微信Id、文件夹路径
+
 + 将微信PC的多个聊天记录数据库合并为单一数据库文件
+
 + 支持微信聊天对话窗口（文本消息，引用消息，图片消息，表情消息，卡片链接消息，系统消息，等）
+
 + 综合管理微信会话、联系人、群聊与朋友圈
+
 + 支持导出微信各类记录(聊天记录，联系人，群聊，等)
+
 + 查看历史朋友圈记录，超越三日限制，随时回看朋友圈历史
+
 + 展示好友数、群聊数及今日收发消息总量的微信统计功能
+
 + 过去15天内每日微信消息数量统计
+
 + 最近一个月内微信互动最频繁的前10位联系人
+
 + 展示微信消息类别占比图表
+
 + 展示微信最近使用的关键字词云图
 
 ### 🚀快速启动
@@ -55,8 +65,11 @@
 #### 安装包方式部署
 
 - 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.0.0/wx-dump-4j-bin.tar.gz)
+
 - 解压缩 `wx-dump-4j-bin.tar.gz`，进入 bin 目录
+
 - 双击`start.bat`启动文件
+
 - 启动成功后访问：[http://localhost:8080](http://localhost:8080)
 
 #### 源码方式部署
@@ -68,6 +81,7 @@
 + 使用开发工具启动 `com.xcs.wx.WxDumpApplication`
 
 + 安装前端依赖`cd wx-dump-ui & npm install`
+
 + 启动前端服务`npm run start`
 
 + 访问：[http://localhost:8000](http://localhost:8000)
@@ -88,9 +102,10 @@
 
 作者晚上还要写博客✍️,平时还需要工作💼,如果帮到了你可以请作者吃个盒饭🥡
 <div>
-<img alt="logo" src="image/WeChatPay.png" style="width: 220px;height: 250px">
-<img alt="logo" src="image/Alipay.png" style="width: 220px;height: 250px">
+<img alt="logo" src="image/WeChatPay.png" style="width: 280px;height: 300px">
+<img alt="logo" src="image/Alipay.png" style="width: 280px;height: 300px">
 </div>
+
 
 
 ## 👥加入我们
