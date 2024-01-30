@@ -20,20 +20,13 @@
     |
     👋 <a href="#功能">功能</a>
     |
-    🍵 <a href="#为何做Spring源码分析">Why</a>
-    |
     🙏 <a href="#顺手点个星">点个星</a>
-    |
-    🌱 <a href="#spring-源码阅读系列">Spring源码</a>
-    |
-    💬 <a href="#与我联系">联系我</a>
     |
     ⛵ <a href="#欢迎贡献">贡献</a>
     |
-    🔄 <a href="#持续更新中">更新</a>
-    |
     💻 <a href="#我的-github-统计">统计</a>
 </p>
+
 
 ## ⚡技术
 
@@ -57,6 +50,32 @@
 + 展示微信消息类别占比图表
 + 展示微信最近使用的关键字词云图
 
+### 🚀快速启动
+
+#### 安装包方式部署
+
+- 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.0.0/wx-dump-4j-bin.tar.gz)
+- 解压缩 `wx-dump-4j-bin.tar.gz`，进入 bin 目录
+- 双击`start.bat`启动文件
+- 启动成功后访问：[http://localhost:8080](http://localhost:8080)
+
+#### 源码方式部署
+
++ 下载源码`git clone https://github.com/xuchengsheng/wx-dump-4j.git`
+
++ 安装后端依赖`cd wx-dump-4j & mvn clean install`
+
++ 使用开发工具启动 `com.xcs.wx.WxDumpApplication`
+
++ 安装前端依赖cd wx-dump-ui & npm install`
++ 启动前端服务`npm run start`
+
++ 访问：[http://localhost:8000](http://localhost:8000)
+
+### ⛔️使用限制
+
+本软件仅适用于Windows操作系统。我们目前不支持macOS、Linux或其他操作系统。如果你在尝试在非Windows系统上运行本软件时可能遇到兼容性问题，这些问题可能导致软件无法正常运行或产生其他意外后果。
+
 ## ⛵欢迎贡献！
 
 如果你发现任何错误🔍或者有改进建议🛠️，欢迎提交 issue 或者 pull request。你的反馈📢对于我非常宝贵💎！
@@ -69,9 +88,10 @@
 
 作者晚上还要写博客✍️,平时还需要工作💼,如果帮到了你可以请作者吃个盒饭🥡
 <div>
-<img alt="logo" src="image/WeChatPay.png" style="width: 370px;height: 400px">
-<img alt="logo" src="image/Alipay.png" style="width: 370px;height: 400px">
+<img alt="logo" src="image/WeChatPay.png" style="width: 220px;height: 250px">
+<img alt="logo" src="image/Alipay.png" style="width: 220px;height: 250px">
 </div>
+
 
 ## 👥加入我们
 
@@ -80,7 +100,7 @@
 1️⃣ **扫描我的二维码**：使用微信的扫一扫功能，扫描下方的二维码，将我添加为你的好友。
 
 <div>
-<img alt="logo" src="image/wechat.jpg" style="width: 344px;height: 483px">
+<img alt="logo" src="image/wechat.jpg" style="width: 280px;height: 320px">
 </div>
 
 2️⃣ **等待好友请求被接受**：一旦你的好友请求被接受，你将收到一份群组邀请。
