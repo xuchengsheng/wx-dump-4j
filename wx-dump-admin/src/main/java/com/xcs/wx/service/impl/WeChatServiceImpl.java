@@ -82,7 +82,7 @@ public class WeChatServiceImpl implements WeChatService {
         String account = getInfo(pid, (baseAddress + versionConfig.getAccount()));
         // 获取微信手机号
         String mobile = getInfo(pid, (baseAddress + versionConfig.getMobile()));
-        // 获取微信手机号
+        // 获取微信秘钥
         String key = getKey(pid, (baseAddress + versionConfig.getKey()));
         // 打开了微信，但是未登录状态
         if (StrUtil.isBlank(account) || StrUtil.isBlank(mobile) || StrUtil.isBlank(key)) {

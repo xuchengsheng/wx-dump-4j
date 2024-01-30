@@ -27,7 +27,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <finalName>wx-dump-admin</finalName>
+                <finalName>wx-dump-4j</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -40,7 +40,7 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>admin-bin</id>
+                                <id>bin</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
