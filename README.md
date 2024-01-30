@@ -67,7 +67,7 @@
 
 + 使用开发工具启动 `com.xcs.wx.WxDumpApplication`
 
-+ 安装前端依赖cd wx-dump-ui & npm install`
++ 安装前端依赖`cd wx-dump-ui & npm install`
 + 启动前端服务`npm run start`
 
 + 访问：[http://localhost:8000](http://localhost:8000)
