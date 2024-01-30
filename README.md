@@ -33,6 +33,7 @@
     👥 <a href="#加入我们">加入我们</a>
 </p>
 
+
 ---
 
 ## ⚡技术
@@ -44,6 +45,8 @@
 </div>
 
 ## 👋功能
+
+[点击此处查看功能展示](docs/display.md)
 
 + 获取当前登录微信的微信昵称、账号、手机号、邮箱、秘钥、微信Id、文件夹路径
 + 将微信PC的多个聊天记录数据库合并为单一数据库文件
@@ -59,7 +62,7 @@
 
 ### 🚀快速启动
 
-#### 安装包方式部署
+**安装包方式部署**
 
 - 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.0.0/wx-dump-4j-bin.tar.gz)
 
@@ -69,7 +72,7 @@
 
 - 启动成功后访问：[http://localhost:8080](http://localhost:8080)
 
-#### 源码方式部署
+**源码方式部署**
 
 + 下载源码`git clone https://github.com/xuchengsheng/wx-dump-4j.git`
 
