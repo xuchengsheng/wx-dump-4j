@@ -1,5 +1,5 @@
 <div align="center">
-    <img alt="logo" src="image/logo.png" style="height: 80px">
+    <img alt="logo" src="image/banner.png" style="height: 80px">
 </div>
 <div align="center">
     <h2>Java版微信聊天记录备份与管理工具</h2>
@@ -22,9 +22,9 @@
     |
     🚀 <a href="#快速启动">快速启动</a>
     |
-    ⛔️ <a href="#免责声明">免责声明</a>
+    ⚠️ <a href="#免责声明">免责声明</a>
     |
-    ⚠️ <a href="#使用限制">使用限制</a>
+    ⛔️ <a href="#使用限制">使用限制</a>
     |
     ⛵ <a href="#欢迎贡献">欢迎贡献</a>
     |
