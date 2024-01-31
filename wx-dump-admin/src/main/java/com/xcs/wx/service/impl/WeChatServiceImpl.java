@@ -1,5 +1,6 @@
 package com.xcs.wx.service.impl;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -13,19 +14,17 @@ import com.xcs.wx.exception.BizException;
 import com.xcs.wx.service.WeChatService;
 import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * 微信服务实现类
@@ -46,11 +45,6 @@ public class WeChatServiceImpl implements WeChatService {
      * 微信程序dll文件
      */
     private static final String MODULE_NAME = "WeChatWin.dll";
-
-    /**
-     * 微信Id前缀
-     */
-    private static final String WXID_PATTERN = "wxid_.*";
 
     /**
      * 文档目录
@@ -85,13 +79,13 @@ public class WeChatServiceImpl implements WeChatService {
         // 获取微信秘钥
         String key = getKey(pid, (baseAddress + versionConfig.getKey()));
         // 打开了微信，但是未登录状态
-        if (StrUtil.isBlank(account) || StrUtil.isBlank(mobile) || StrUtil.isBlank(key)) {
-            throw new BizException(-1, "微信已启动，但尚未登录。请在微信中完成登录操作后再次尝试。");
+        if (StrUtil.isBlank(key)) {
+            throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
         }
         // 获取微信文件目录
         String basePath = getBasePath();
         // 获取微信Id
-        String wxId = getWxId(basePath);
+        String wxId = getWxId(pid);
         // 返回配置信息
         WeChatVO weChatVO = new WeChatVO(pid, baseAddress, version, nickname, account, mobile, key, basePath, wxId);
         // 保存用户信息
@@ -181,12 +175,8 @@ public class WeChatServiceImpl implements WeChatService {
      */
     private String getInfo(int pid, long address) {
         Kernel32 kernel32 = Kernel32.INSTANCE;
-
         // 打开目标进程
         WinNT.HANDLE process = kernel32.OpenProcess(WinNT.PROCESS_VM_READ, false, pid);
-        if (process == null) {
-            return null;
-        }
 
         // 分配内存作为缓冲区读取数据
         int bufferSize = 64;
@@ -231,11 +221,6 @@ public class WeChatServiceImpl implements WeChatService {
 
         // 打开目标进程，获取其句柄
         WinNT.HANDLE process = kernel32.OpenProcess(WinNT.PROCESS_VM_READ, false, pid);
-
-        // 如果无法打开进程，返回 null
-        if (process == null) {
-            return null;
-        }
 
         // 准备缓冲区用于读取内存
         Memory buffer = new Memory(8);
@@ -326,48 +311,159 @@ public class WeChatServiceImpl implements WeChatService {
     }
 
     /**
-     * 获取微信Id
+     * 根据进程ID获取微信ID。
      *
-     * @param basePath 基础路径
-     * @return String
+     * @param pid 目标进程ID
+     * @return 微信ID
      */
-    private String getWxId(String basePath) {
-        try {
-            // 将字符串路径转换为 Path 对象
-            Path startPath = Paths.get(basePath);
-            // 创建一个匹配 wxid_ 开头的文件夹名称的正则表达式
-            Pattern pattern = Pattern.compile(WXID_PATTERN);
-            // 初始化一个记录最新时间的变量
-            FileTime latestTime = FileTime.fromMillis(0);
-            // 用于记录最新文件的 wxid
-            String wxId = null;
+    private String getWxId(int pid) {
+        // 获取Kernel32实例
+        Kernel32 kernel32 = Kernel32.INSTANCE;
+        // 打开目标进程句柄
+        WinNT.HANDLE process = kernel32.OpenProcess(0x1F0FFF, false, pid);
+        // 设置要匹配的模式字符串
+        String pattern = "\\Msg\\FTSContact";
+        // 在目标进程中扫描符合模式的内存位置
+        List<Pointer> addresses = patternScanAll(process, pattern, 10);
+        // 遍历匹配到的内存位置
+        for (Pointer address : addresses) {
+            // 分配内存作为缓冲区读取数据
+            int bufferSize = 80;
+            Memory buffer = new Memory(bufferSize);
+            IntByReference read = new IntByReference();
+            // 从指定地址的前一部分开始读取内存，而不是从地址的确切位置开始。
+            Pointer offsetPointer = new Pointer(Pointer.nativeValue(address) - 30);
+            // 从指定地址读取内存数据
+            boolean success = kernel32.ReadProcessMemory(process, offsetPointer, buffer, bufferSize, read);
+            if (success) {
+                // 将读取的字节转换为字符串
+                byte[] dataBytes = buffer.getByteArray(0, read.getValue());
+                String data = new String(dataBytes, 0, read.getValue());
+                // 对字符串进行处理，提取微信ID信息
+                data = data.split("\\\\Msg")[0];
+                data = data.split("\\\\")[1];
+                // 返回微信Id
+                return data;
+            }
+        }
+        // 关闭目标进程句柄
+        kernel32.CloseHandle(process);
+        // 返回空
+        return null;
+    }
 
-            // 使用 DirectoryStream 遍历基本路径下的所有目录和文件
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(startPath)) {
-                for (Path path : stream) {
-                    // 检查当前路径是否为目录并且名称符合 wxid_ 正则表达式
-                    if (Files.isDirectory(path) && pattern.matcher(path.getFileName().toString()).matches()) {
-                        // 构建指向 config/aconfig.dat 的完整路径
-                        Path configPath = path.resolve("config/aconfig.dat");
-                        // 检查 aconfig.dat 文件是否存在且为常规文件
-                        if (Files.exists(configPath) && Files.isRegularFile(configPath)) {
-                            // 获取文件的最后修改时间
-                            FileTime fileTime = Files.getLastModifiedTime(configPath);
-                            // 比较并更新最新的修改时间和对应的 wxid
-                            if (fileTime.compareTo(latestTime) > 0) {
-                                latestTime = fileTime;
-                                wxId = path.getFileName().toString();
-                            }
-                        }
-                    }
+    /**
+     * 在指定进程的虚拟地址空间中扫描所有符合指定模式的内存位置。
+     *
+     * @param process 指定进程的句柄
+     * @param pattern 要匹配的模式字符串
+     * @param findNum 最大匹配数量
+     * @return 符合模式的内存位置列表
+     */
+    public List<Pointer> patternScanAll(WinNT.HANDLE process, String pattern, int findNum) {
+        // 存储符合模式的内存位置列表
+        List<Pointer> found = new ArrayList<>();
+        // 根据系统架构设置用户空间限制
+        long userSpaceLimit = "amd64".equals(System.getProperty("os.arch")) ? 0x7FFFFFFF0000L : 0x7FFF0000L;
+        // 初始下一个扫描位置
+        long nextRegion = 0;
+        // 循环扫描直到达到用户空间限制或找到足够的匹配位置
+        while (nextRegion < userSpaceLimit) {
+            // 执行单页扫描，获取扫描结果
+            Pair<Long, List<Pointer>> pair = scanPatternPage(process, nextRegion, pattern);
+            // 更新下一个扫描位置
+            nextRegion = pair.getLeft();
+            // 获取单页扫描的匹配位置列表
+            List<Pointer> pageFound = pair.getRight();
+
+            // 如果单页扫描找到匹配位置，将其添加到总的匹配位置列表中
+            if (!pageFound.isEmpty()) {
+                found.addAll(pageFound);
+            }
+            // 如果找到足够的匹配位置，跳出循环
+            if (found.size() > findNum) {
+                break;
+            }
+        }
+        // 返回符合模式的内存位置列表
+        return found;
+    }
+
+    /**
+     * 扫描内存页
+     *
+     * @param process      指定进程的句柄
+     * @param startAddress 开始的内存地址
+     * @param pattern      要匹配的模式字符串
+     * @return Pair
+     */
+    private Pair<Long, List<Pointer>> scanPatternPage(WinNT.HANDLE process, long startAddress, String pattern) {
+        // 获取内存基本信息
+        WinNT.MEMORY_BASIC_INFORMATION mbi = new WinNT.MEMORY_BASIC_INFORMATION();
+        // 查询指定虚拟内存地址
+        Kernel32.INSTANCE.VirtualQueryEx(process, new Pointer(startAddress), mbi, new BaseTSD.SIZE_T(mbi.size()));
+        // 计算下一个内存区域的起始地址
+        long nextRegion = Pointer.nativeValue(mbi.baseAddress) + mbi.regionSize.longValue();
+        // 定义允许的内存保护标志
+        int[] allowedProtections = {WinNT.PAGE_EXECUTE, WinNT.PAGE_EXECUTE_READ, WinNT.PAGE_EXECUTE_READWRITE, WinNT.PAGE_READWRITE, WinNT.PAGE_READONLY};
+
+        List<Pointer> foundPointer = new ArrayList<>();
+
+        // 检查内存状态和保护标志是否符合要求
+        if (!(mbi.state.intValue() == WinNT.MEM_COMMIT && ArrayUtil.contains(allowedProtections, mbi.protect.intValue()))) {
+            return Pair.of(nextRegion, foundPointer);
+        }
+
+        // 创建一个 Native Memory 对象，用于存储从进程中读取的内存数据
+        Memory memory = new Memory(mbi.regionSize.intValue());
+        // 创建一个引用对象，用于存储 ReadProcessMemory 函数返回的已读取字节数
+        IntByReference bytesRead = new IntByReference();
+        // 从指定进程中读取内存数据，并将结果存储到 Native Memory 对象中
+        Kernel32.INSTANCE.ReadProcessMemory(process, new Pointer(startAddress), memory, mbi.regionSize.intValue(), bytesRead);
+        // 从 Native Memory 对象中获取已读取的字节数，并创建一个字节数组存储读取的内存数据
+        byte[] buffer = memory.getByteArray(0, bytesRead.getValue());
+
+        // 查找匹配的模式在内存中的起始位置
+        for (int start : findMatches(buffer, pattern.getBytes())) {
+            foundPointer.add(new Pointer(startAddress + start));
+        }
+        return Pair.of(nextRegion, foundPointer);
+    }
+
+    /**
+     * 在字节数组中查找匹配指定模式的位置索引数组。
+     *
+     * @param inputBytes   待查找的字节数组
+     * @param patternBytes 要匹配的模式字节数组
+     * @return 匹配位置索引数组
+     */
+    private static int[] findMatches(byte[] inputBytes, byte[] patternBytes) {
+        // 初始化匹配位置索引数组
+        int[] matches = new int[0];
+
+        // 遍历待查找的字节数组
+        for (int i = 0; i <= inputBytes.length - patternBytes.length; i++) {
+            // 假设当前位置开始存在匹配
+            boolean match = true;
+
+            // 遍历模式字节数组，检查是否与待查找的子数组匹配
+            for (int j = 0; j < patternBytes.length; j++) {
+                if (inputBytes[i + j] != patternBytes[j]) {
+                    // 如果有不匹配的字节，标记为不匹配，并中断内层循环
+                    match = false;
+                    break;
                 }
             }
-            // 返回具有最新 aconfig.dat 文件的 wxid_ 目录名称，如果没有找到则返回 null
-            return wxId;
-        } catch (Exception e) {
-            e.printStackTrace();
+            // 如果找到匹配的位置，将其添加到匹配位置索引数组中
+            if (match) {
+                int[] newMatches = new int[matches.length + 1];
+                System.arraycopy(matches, 0, newMatches, 0, matches.length);
+                newMatches[matches.length] = i;
+                matches = newMatches;
+            }
         }
-        return null;
+        // 返回匹配位置索引数组
+        return matches;
     }
 
     /**
