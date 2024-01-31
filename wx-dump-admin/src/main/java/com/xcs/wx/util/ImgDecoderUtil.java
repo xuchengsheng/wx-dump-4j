@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
 
 /**
  * @author xcs
@@ -135,20 +133,5 @@ public class ImgDecoderUtil {
 
         // 如果没有匹配的文件类型，返回错误代码
         return new int[]{-1, -1};
-    }
-
-    public static void main(String[] args) {
-        String scanPath = "D:\\WeChat Files\\WeChat Files\\wxid_esfvm4299gsy22\\FileStorage\\MsgAttach\\945dad30f07d80b9f7a4f0b8bbe3dc41\\Image\\2024-01";
-        // 文件分隔符
-        String separator = System.getProperty("file.separator");
-        // 替换目录
-        String replacementPath = System.getProperty("user.dir") + separator + "img1";
-        try (Stream<Path> stream = Files.walk(Paths.get(scanPath))) {
-            stream.forEach(item -> {
-                decodeDat(item.toString(), replacementPath);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
