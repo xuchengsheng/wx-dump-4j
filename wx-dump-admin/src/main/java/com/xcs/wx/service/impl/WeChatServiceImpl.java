@@ -341,9 +341,10 @@ public class WeChatServiceImpl implements WeChatService {
                 String data = new String(dataBytes, 0, read.getValue());
                 // 对字符串进行处理，提取微信ID信息
                 data = data.split("\\\\Msg")[0];
-                data = data.split("\\\\")[1];
-                // 返回微信Id
-                return data;
+                // 通过文件分隔符分割
+                String[] newData = data.split("\\\\");
+                // 取最后一个为微信Id
+                return newData[newData.length-1];
             }
         }
         // 关闭目标进程句柄
@@ -437,7 +438,7 @@ public class WeChatServiceImpl implements WeChatService {
      * @param patternBytes 要匹配的模式字节数组
      * @return 匹配位置索引数组
      */
-    private static int[] findMatches(byte[] inputBytes, byte[] patternBytes) {
+    private int[] findMatches(byte[] inputBytes, byte[] patternBytes) {
         // 初始化匹配位置索引数组
         int[] matches = new int[0];
 
