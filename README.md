@@ -42,7 +42,18 @@
     <img src="https://img.shields.io/badge/Java-8%2B-%23437291?logo=openjdk&logoColor=%23437291"/>
     <img src="https://img.shields.io/badge/Spring-5.3.10-%23437291?logo=Spring&logoColor=%236DB33F&color=%236DB33F"/>
     <img src="https://img.shields.io/badge/SpringBoot-2.5.5-%23437291?logo=SpringBoot&logoColor=%236DB33F&color=%236DB33F"/>
+    <img src="https://img.shields.io/badge/JNA-5.8.0-%23437291?logo=JNA&logoColor=%23228B22&color=%23228B22"/>
+    <img src="https://img.shields.io/badge/Hutool-5.8.16-%23437291?logo=JNA&logoColor=%23F08080&color=%23F08080"/>
+    <img src="https://img.shields.io/badge/easyexcel-5.8.16-%23437291?logo=JNA&logoColor=%23D2691E&color=%23D2691E"/>
+    <img src="https://img.shields.io/badge/protobuf-3.25.1-%23437291?logo=JNA&logoColor=%23800080&color=%23800080"/>
+    <img src="https://img.shields.io/badge/mapstruct-1.4.2-%23437291?logo=JNA&logoColor=%23DC143C&color=%23DC143C"/>
+    <img src="https://img.shields.io/badge/druid-1.2.20-%23437291?logo=JNA&logoColor=%23C71585&color=%23C71585"/>
+    <img src="https://img.shields.io/badge/mybatisPlus-3.5.4.1-%23437291?logo=JNA&logoColor=%234B0082&color=%234B0082"/>
+    <img src="https://img.shields.io/badge/sqlite-3.34.0-%23437291?logo=JNA&logoColor=%230000CD&color=%230000CD"/>
+    <img src="https://img.shields.io/badge/lombok-1.18.20-%23437291?logo=JNA&logoColor=%23008B8B&color=%23008B8B"/>
+
 </div>
+
 
 ## 👋功能
 
