@@ -4,14 +4,17 @@ import React, { useEffect, useState } from 'react';
 
 const RecentUsedKeyWord: React.FC = () => {
   const [data, setData] = useState<RecentUsedKeyWordItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getRecentUsedKeyWord = async () => {
+    setIsLoading(true);
     try {
       const response = await queryRecentUsedKeyWord();
       setData(response.data);
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -25,7 +28,7 @@ const RecentUsedKeyWord: React.FC = () => {
     colorField: 'text',
   };
 
-  return <WordCloud {...config} />;
+  return <WordCloud loading={isLoading} {...config} />;
 };
 
 export default RecentUsedKeyWord;

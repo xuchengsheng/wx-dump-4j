@@ -1,10 +1,12 @@
-import Footer from '@/components/Footer';
 import DataBase from './pages/WeChat/DataBase';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+import { Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
@@ -21,7 +23,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
   return {
     actionsRender: () => [<DataBase key="db" />],
     avatarProps: {
-      src: 'https://wx.qlogo.cn/mmhead/ver_1/Z06qU8QcYVe54q5GYrB9icJ6Js2jOVsiastLrb7c7rUfN3UtMeC9we1EC3AoL2xTmm09a9LXr0womXicQzUPR6aHDVKfa8YZCKHeazibLu0bgII/132',
+      title: <Avatar style={{ backgroundColor: '#87d068' }} size={28} icon={<UserOutlined />} />
     },
     onPageChange: () => {
       

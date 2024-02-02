@@ -4,14 +4,17 @@ import React, { useEffect, useState } from 'react';
 
 const CountRecentMsg: React.FC = () => {
   const [data, setData] = useState<CountRecentMsgItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getDailyMsgCount = async () => {
+    setIsLoading(true);
     try {
       const response = await countRecentMsgs();
       setData(response.data);
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   const config = {
@@ -28,7 +31,7 @@ const CountRecentMsg: React.FC = () => {
     getDailyMsgCount();
   }, []);
 
-  return <Line {...config} />;
+  return <Line loading={isLoading} {...config} />;
 };
 
 export default CountRecentMsg;

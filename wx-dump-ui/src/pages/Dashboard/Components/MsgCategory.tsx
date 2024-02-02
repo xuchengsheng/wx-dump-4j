@@ -4,14 +4,17 @@ import React, { useEffect, useState } from 'react';
 
 const MsgCategory: React.FC = () => {
   const [data, setData] = useState<MsgTypeDistributionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const getSession = async () => {
+  const getMsgTypeDistribution = async () => {
+    setIsLoading(true);
     try {
       const response = await msgTypeDistribution();
       setData(response.data);
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   const config = {
@@ -33,10 +36,10 @@ const MsgCategory: React.FC = () => {
   };
 
   useEffect(() => {
-    getSession();
+    getMsgTypeDistribution();
   }, []);
 
-  return <Pie {...config} />;
+  return <Pie loading={isLoading} {...config} />;
 };
 
 export default MsgCategory;
