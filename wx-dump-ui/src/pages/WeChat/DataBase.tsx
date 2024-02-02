@@ -1,12 +1,13 @@
 import { decrypt, queryWeChat } from '@/services/Wechat/DataBase';
 import { SyncOutlined } from '@ant-design/icons';
-import { Button, Descriptions, Flex, Modal, notification, Space } from 'antd';
+import { Button, Descriptions, Flex, Modal, notification, Space, Spin } from 'antd';
 import React, { useState } from 'react';
 
 const DataBase: React.FC = () => {
   const [isDecryptOpen, setIsDecryptOpen] = useState(false);
+  const [isQueryWeChat, setIsQueryWeChat] = useState(false);
   const [isDecrypt, setIsDecrypt] = useState(false);
-  const [wechat, setWechat] = useState<WeChat>();
+  const [wechat, setWechat] = useState<WeChat | null>(null);
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -29,6 +30,8 @@ const DataBase: React.FC = () => {
 
   const hanldelWeChat = async () => {
     setIsDecryptOpen(true);
+    setIsQueryWeChat(true);
+    setWechat(null);
     try {
       const response = await queryWeChat();
       if (response.success) {
@@ -37,6 +40,7 @@ const DataBase: React.FC = () => {
     } catch (error) {
       console.error(error);
     }
+    setIsQueryWeChat(false);
   };
 
   const handleCancel = async () => {
@@ -75,29 +79,31 @@ const DataBase: React.FC = () => {
         onOk={handelDataBaseDecrypt}
         onCancel={handleCancel}
       >
-        <Descriptions layout="vertical" column={4} style={{ marginTop: 20 }}>
-          <Descriptions.Item label="进程Id">{wechat?.pid}</Descriptions.Item>
-          <Descriptions.Item label="基址">{wechat?.baseAddress}</Descriptions.Item>
-          <Descriptions.Item label="版本号">{wechat?.version}</Descriptions.Item>
-          <Descriptions.Item label="昵称">{wechat?.nickname}</Descriptions.Item>
-          <Descriptions.Item label="账号">{wechat?.account}</Descriptions.Item>
-          <Descriptions.Item label="手机号">{wechat?.mobile}</Descriptions.Item>
-          <Descriptions.Item label="微信Id">{wechat?.wxId}</Descriptions.Item>
-          <Descriptions.Item label="文件目录">{wechat?.basePath}</Descriptions.Item>
-        </Descriptions>
-        <Descriptions column={1} layout="vertical">
-          <Descriptions.Item label="秘钥">{wechat?.key}</Descriptions.Item>
-        </Descriptions>
-        <Flex justify="flex-end">
-          <Space>
-            <Button disabled={isDecrypt} onClick={handleCancel}>
-              取消同步
-            </Button>
-            <Button type="primary" loading={isDecrypt} onClick={handelDataBaseDecrypt}>
-              开始同步
-            </Button>
-          </Space>
-        </Flex>
+        <Spin tip="数据加载中..." spinning={isQueryWeChat}>
+          <Descriptions layout="vertical" column={4} style={{ marginTop: 20 }}>
+            <Descriptions.Item label="进程Id">{wechat?.pid}</Descriptions.Item>
+            <Descriptions.Item label="基址">{wechat?.baseAddress}</Descriptions.Item>
+            <Descriptions.Item label="版本号">{wechat?.version}</Descriptions.Item>
+            <Descriptions.Item label="昵称">{wechat?.nickname}</Descriptions.Item>
+            <Descriptions.Item label="账号">{wechat?.account}</Descriptions.Item>
+            <Descriptions.Item label="手机号">{wechat?.mobile}</Descriptions.Item>
+            <Descriptions.Item label="微信Id">{wechat?.wxId}</Descriptions.Item>
+            <Descriptions.Item label="文件目录">{wechat?.basePath}</Descriptions.Item>
+          </Descriptions>
+          <Descriptions column={1} layout="vertical">
+            <Descriptions.Item label="秘钥">{wechat?.key}</Descriptions.Item>
+          </Descriptions>
+          <Flex justify="flex-end">
+            <Space>
+              <Button disabled={isDecrypt} onClick={handleCancel}>
+                取消同步
+              </Button>
+              <Button type="primary" loading={isDecrypt} onClick={handelDataBaseDecrypt}>
+                开始同步
+              </Button>
+            </Space>
+          </Flex>
+        </Spin>
       </Modal>
     </>
   );
