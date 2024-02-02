@@ -12,6 +12,13 @@
 
     <fileSets>
         <fileSet>
+            <directory>../wx-dump-admin/src/main/resources</directory>
+            <outputDirectory>/conf</outputDirectory>
+            <includes>
+                <include>*.yml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>../wx-dump-ui/dist</directory>
             <outputDirectory>/html</outputDirectory>
             <includes>

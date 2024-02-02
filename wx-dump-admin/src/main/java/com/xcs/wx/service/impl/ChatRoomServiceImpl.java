@@ -3,6 +3,7 @@ package com.xcs.wx.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.util.ObjUtil;
 import com.alibaba.excel.EasyExcel;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xcs.wx.domain.ChatRoomInfo;
@@ -124,9 +125,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoomInfo chatRoomInfo = chatRoomInfoRepository.queryChatRoomInfo(chatRoomDetailVo.getChatRoomName());
         // 转换参数
         ChatRoomInfoVO chatRoomInfoVO = chatRoomMapping.convert(chatRoomInfo);
+        // 发布时间
+        Long announcementPublishTime = chatRoomInfoVO.getAnnouncementPublishTime();
         // 处理发布时间
-        if (chatRoomInfoVO.getAnnouncementPublishTime() > 0) {
-            chatRoomInfoVO.setStrAnnouncementPublishTime(DateUtil.formatDateTime(new Date(chatRoomInfoVO.getAnnouncementPublishTime() * 1000L)));
+        if (ObjUtil.isNotEmpty(announcementPublishTime) && announcementPublishTime > 0) {
+            chatRoomInfoVO.setStrAnnouncementPublishTime(DateUtil.formatDateTime(new Date(announcementPublishTime * 1000L)));
         }
         // 发布人
         chatRoomInfoVO.setAnnouncementPublisher(contactRepository.getContactNickname(chatRoomInfoVO.getAnnouncementEditor()));
