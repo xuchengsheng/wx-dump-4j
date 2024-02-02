@@ -2,6 +2,9 @@ package com.xcs.wx.util;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * @author xcs
@@ -9,22 +12,29 @@ import javax.crypto.spec.SecretKeySpec;
  **/
 public class Pbkdf2HmacUtil {
 
+    private Pbkdf2HmacUtil() {
+    }
+
+    /**
+     * 算法
+     */
+    private static final String ALGORITHM = "HmacSHA1";
+
     /**
      * 使用HMAC算法进行PBKDF2密钥派生
      *
-     * @param algorithm HMAC使用的哈希算法
-     * @param password 用户的密码
-     * @param salt 加盐值，用于增加加密的复杂度
+     * @param password   用户的密码
+     * @param salt       加盐值，用于增加加密的复杂度
      * @param iterations 迭代次数，增加计算量以抵抗暴力破解
-     * @param dkLen 生成的密钥长度
+     * @param dkLen      生成的密钥长度
      * @return 派生出的密钥
-     * @throws Exception 抛出异常
+     * @throws NoSuchAlgorithmException InvalidKeyException 抛出异常
      */
-    public static byte[] pbkdf2Hmac(String algorithm, byte[] password, byte[] salt, int iterations, int dkLen) throws Exception {
+    public static byte[] pbkdf2Hmac(byte[] password, byte[] salt, int iterations, int dkLen) throws NoSuchAlgorithmException, InvalidKeyException {
         // 初始化Mac实例
-        Mac mac = Mac.getInstance(algorithm);
+        Mac mac = Mac.getInstance(ALGORITHM);
         // 使用密码和算法初始化Mac
-        mac.init(new SecretKeySpec(password, algorithm));
+        mac.init(new SecretKeySpec(password, ALGORITHM));
 
         // 用于存储最终结果的数组
         byte[] result = new byte[dkLen];
@@ -61,5 +71,29 @@ public class Pbkdf2HmacUtil {
         }
         // 返回最终的密钥
         return result;
+    }
+
+    /**
+     * 检查密钥是否有效
+     *
+     * @param byteKey 密钥的字节数组
+     * @param macSalt MAC盐值
+     * @param hashMac 预期的MAC哈希值
+     * @param message 消息内容
+     * @return 如果密钥有效返回true，否则返回false
+     * @throws Exception 抛出异常
+     */
+    public static boolean checkKey(byte[] byteKey, byte[] macSalt, byte[] hashMac, byte[] message) throws Exception {
+        // 使用PBKDF2算法生成MAC密钥
+        byte[] macKey = pbkdf2Hmac(byteKey, macSalt, 2, 32);
+        Mac mac = Mac.getInstance(ALGORITHM);
+        SecretKeySpec keySpec = new SecretKeySpec(macKey, ALGORITHM);
+        mac.init(keySpec);
+        // 更新MAC计算的消息内容
+        mac.update(message);
+        // 添加额外的数据到消息中
+        mac.update(new byte[]{1, 0, 0, 0});
+        // 比较计算出的MAC值和预期的MAC值是否相同
+        return Arrays.equals(hashMac, mac.doFinal());
     }
 }

@@ -1,6 +1,7 @@
 package com.xcs.wx.service.impl;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -12,19 +13,22 @@ import com.xcs.wx.config.WeChatOffsetProperties;
 import com.xcs.wx.domain.vo.WeChatVO;
 import com.xcs.wx.exception.BizException;
 import com.xcs.wx.service.WeChatService;
+import com.xcs.wx.util.Pbkdf2HmacUtil;
 import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.List;
+import java.util.*;
 
 /**
  * 微信服务实现类
@@ -32,6 +36,7 @@ import java.util.List;
  * @author xcs
  * @date 2023年12月25日 09时37分
  **/
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WeChatServiceImpl implements WeChatService {
@@ -69,29 +74,70 @@ public class WeChatServiceImpl implements WeChatService {
         // 获取版本号
         String version = getVersion(pid);
         // 读取微信版本对应的偏移量
-        WeChatOffsetProperties.VersionConfig versionConfig = weChatOffsetConfig.getVersion().get(version);
+        WeChatOffsetProperties.VersionConfig versionConfig = getVersionConfig(version);
+        // 未读取到偏移量
+        if (versionConfig == null) {
+            throw new BizException(-1, "不支持当前微信版本号" + version + "，请升级到微信最新版本。");
+        }
         // 获取微信昵称
         String nickname = getInfo(pid, (baseAddress + versionConfig.getNickname()));
         // 获取微信账号
         String account = getInfo(pid, (baseAddress + versionConfig.getAccount()));
         // 获取微信手机号
         String mobile = getInfo(pid, (baseAddress + versionConfig.getMobile()));
-        // 获取微信秘钥
-        String key = getKey(pid, (baseAddress + versionConfig.getKey()));
-        // 打开了微信，但是未登录状态
-        if (StrUtil.isBlank(key)) {
-            throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
-        }
         // 获取微信文件目录
         String basePath = getBasePath();
         // 获取微信Id
         String wxId = getWxId(pid);
+        // 获取微信秘钥
+        String key = getKey(pid, basePath + System.getProperty("file.separator") + wxId);
+        // 获取微信秘钥失败
+        if (StrUtil.isBlank(key)) {
+            throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
+        }
         // 返回配置信息
         WeChatVO weChatVO = new WeChatVO(pid, baseAddress, version, nickname, account, mobile, key, basePath, wxId);
         // 保存用户信息
         UserUtil.saveUser(weChatVO);
         // 返回
         return weChatVO;
+    }
+
+    /**
+     * 根据版本号查找匹配的内容
+     *
+     * @param version 要查找的版本号
+     * @return 返回匹配的版本内容，如果未找到则返回 null
+     */
+    public WeChatOffsetProperties.VersionConfig getVersionConfig(String version) {
+        Map<String, WeChatOffsetProperties.VersionConfig> versionConfigMap = weChatOffsetConfig.getVersion();
+        // 尝试精准匹配
+        if (versionConfigMap.containsKey(version)) {
+            return versionConfigMap.get(version);
+        }
+
+        String matchingVersion = null;
+
+        // 遍历版本数据的所有版本号，找到匹配前三位相同的最新版本
+        for (String availableVersion : versionConfigMap.keySet()) {
+            if (isMatchingPrefix(version, availableVersion) && (matchingVersion == null || availableVersion.compareTo(matchingVersion) > 0)) {
+                matchingVersion = availableVersion;
+            }
+        }
+
+        // 返回匹配的版本内容，如果都没有匹配到则返回 null
+        return (matchingVersion != null) ? versionConfigMap.get(matchingVersion) : null;
+    }
+
+    /**
+     * 判断两个版本号前三位是否相同
+     *
+     * @param version1 版本号1
+     * @param version2 版本号2
+     * @return 如果前三位相同返回 true，否则返回 false
+     */
+    private boolean isMatchingPrefix(String version1, String version2) {
+        return version1.substring(0, 7).equals(version2.substring(0, 7));
     }
 
     /**
@@ -210,25 +256,77 @@ public class WeChatServiceImpl implements WeChatService {
     }
 
     /**
+     * 获取指定进程和数据库路径下的密钥
+     *
+     * @param pid    目标进程的进程ID
+     * @param dbPath 数据库路径
+     * @return 返回找到的密钥，如果未找到则返回null
+     */
+    private String getKey(int pid, String dbPath) {
+        // 打开目标进程
+        WinNT.HANDLE process = Kernel32.INSTANCE.OpenProcess(0x1F0FFF, false, pid);
+
+        // 定义不同平台对应的字节数组
+        byte[] iphoneByteArray = {105, 112, 104, 111, 110, 101, 0};
+        byte[] androidByteArray = {97, 110, 100, 114, 111, 105, 100, 0};
+        byte[] ipadByteArray = {105, 112, 97, 100, 0};
+
+        // 用于存储不同平台的模块扫描结果
+        List<Pointer> typeAddress = new ArrayList<>();
+        List<Pointer> typeAddress1 = patternScanModule(process, iphoneByteArray);
+        List<Pointer> typeAddress2 = patternScanModule(process, androidByteArray);
+        List<Pointer> typeAddress3 = patternScanModule(process, ipadByteArray);
+
+        // 根据扫描结果确定选择哪种平台的模块地址
+        if (typeAddress1.size() >= 2) {
+            typeAddress = typeAddress1;
+        } else if (typeAddress2.size() >= 2) {
+            typeAddress = typeAddress2;
+        } else if (typeAddress3.size() >= 2) {
+            typeAddress = typeAddress3;
+        }
+
+        // 拼接MicroMsg数据库路径
+        String microMsg = dbPath + "\\Msg\\MicroMsg.db";
+
+        // 获取倒序迭代器
+        ListIterator<Pointer> pointerListIterator = typeAddress.listIterator(typeAddress.size());
+
+        // 倒序遍历模块地址列表
+        while (pointerListIterator.hasPrevious()) {
+            Pointer addressPointer = pointerListIterator.previous();
+            long address = Pointer.nativeValue(addressPointer);
+
+            // 在地址范围内以步长8递减遍历，读取密钥
+            for (long i = address; i >= (address - 2000); i -= 8) {
+                // 读取key
+                String key = readKey(process, i);
+
+                // 如果密钥不为空且验证通过，则返回密钥
+                if (key != null && verifyKey(key, microMsg)) {
+                    return key;
+                }
+            }
+        }
+
+        // 未找到匹配的密钥，返回null
+        return null;
+    }
+
+    /**
      * 获取秘钥
      *
-     * @param pid     目标进程的 ID。
      * @param address 要读取的内存地址
      * @return 读取到的秘钥，如果失败则返回 null。
      */
-    private String getKey(int pid, long address) {
+    private String readKey(WinNT.HANDLE process, long address) {
         Kernel32 kernel32 = Kernel32.INSTANCE;
-
-        // 打开目标进程，获取其句柄
-        WinNT.HANDLE process = kernel32.OpenProcess(WinNT.PROCESS_VM_READ, false, pid);
 
         // 准备缓冲区用于读取内存
         Memory buffer = new Memory(8);
         IntByReference bytesRead = new IntByReference();
         // 读取目标进程的内存地址
         if (!kernel32.ReadProcessMemory(process, new Pointer(address), buffer, (int) buffer.size(), bytesRead)) {
-            // 如果读取失败，关闭进程句柄并返回 null
-            kernel32.CloseHandle(process);
             return null;
         }
 
@@ -240,8 +338,6 @@ public class WeChatServiceImpl implements WeChatService {
         Memory keyBuffer = new Memory(32);
         // 从计算出的密钥地址读取密钥
         if (!kernel32.ReadProcessMemory(process, new Pointer(keyAddress), keyBuffer, (int) keyBuffer.size(), bytesRead)) {
-            // 如果读取密钥失败，关闭进程句柄并返回 null
-            kernel32.CloseHandle(process);
             return null;
         }
 
@@ -253,12 +349,163 @@ public class WeChatServiceImpl implements WeChatService {
                 formatter.format("%02x", b & 0xff);
             }
         }
-
-        // 关闭进程句柄
-        kernel32.CloseHandle(process);
-
         // 返回密钥的十六进制表示
         return sb.toString();
+    }
+
+    /**
+     * 样子秘钥是否正确
+     *
+     * @param password 秘钥
+     * @param dbFile   被验证的文件
+     * @return 是否验证成功
+     */
+    private boolean verifyKey(String password, String dbFile) {
+        // 创建File文件
+        File file = new File(dbFile);
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            // 文件大小
+            byte[] fileContent = new byte[5000];
+            // 读取内容
+            fis.read(fileContent);
+
+            // 提取盐值
+            byte[] salt = Arrays.copyOfRange(fileContent, 0, 16);
+            // 提取第一页
+            byte[] firstPage = Arrays.copyOfRange(fileContent, 16, 4096);
+            // 提取第一页的内容与IV
+            byte[] firstPageBodyAndIv = Arrays.copyOfRange(firstPage, 0, firstPage.length - 32);
+            // 提取第一页的hashMac
+            byte[] firstPageHashMac = Arrays.copyOfRange(firstPage, firstPage.length - 32, firstPage.length - 12);
+
+            // 生成key
+            byte[] key = Pbkdf2HmacUtil.pbkdf2Hmac(HexUtil.decodeHex(password), salt, 64000, 32);
+
+            byte[] macSalt = new byte[salt.length];
+            for (int i = 0; i < salt.length; i++) {
+                macSalt[i] = (byte) (salt[i] ^ 58);
+            }
+            // 秘钥匹配成功
+            return Pbkdf2HmacUtil.checkKey(key, macSalt, firstPageHashMac, firstPageBodyAndIv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 列出并检索进程中指定已加载模块
+     *
+     * @param process 目标进程
+     */
+    private List<Psapi.MODULEINFO> enumProcessModule(WinNT.HANDLE process) {
+        List<Psapi.MODULEINFO> moduleInfos = new ArrayList<>();
+        // 获取模块句柄列表
+        WinNT.HMODULE[] hModules = new WinNT.HMODULE[1024];
+        // 指针大小
+        int cbNeeded = hModules.length * Native.POINTER_SIZE;
+        // 存储所有模块句柄所需的字节数
+        IntByReference read = new IntByReference();
+        // 调用 EnumProcessModules 方法
+        boolean success = Psapi.INSTANCE.EnumProcessModules(process, hModules, cbNeeded, read);
+        // 读取模块失败
+        if (!success) {
+            log.warn("EnumProcessModules failed. Error code: " + Native.getLastError());
+            return moduleInfos;
+        }
+        // 遍历加载到的所有模块
+        for (WinDef.HMODULE hModule : hModules) {
+            // 模块不等于空的情况下
+            if (hModule != null) {
+                // 获取模块信息
+                Psapi.MODULEINFO moduleInfo = new Psapi.MODULEINFO();
+                // 加载模块的详细信息
+                boolean moduleInformationSuccess = Psapi.INSTANCE.GetModuleInformation(process, hModule, moduleInfo, moduleInfo.size());
+                // 读取失败
+                if (!moduleInformationSuccess) {
+                    log.warn("GetModuleInformation failed. Error code: " + Native.getLastError());
+                    continue;
+                }
+                moduleInfos.add(moduleInfo);
+            }
+        }
+        return moduleInfos;
+    }
+
+    /**
+     * 通过模块名检索指定进程加载的模块信息
+     *
+     * @param process 指定的进程句柄
+     * @return 包含模块信息的 Psapi.MODULEINFO 对象，如果未找到，则返回 null
+     */
+    private Psapi.MODULEINFO moduleFromName(WinNT.HANDLE process) {
+        // 列出并检索进程中指定已加载模块
+        List<Psapi.MODULEINFO> moduleInfos = enumProcessModule(process);
+
+        // 遍历模块列表
+        for (Psapi.MODULEINFO moduleInfo : moduleInfos) {
+            // 创建用于存储模块文件名的字节数组
+            byte[] buffer = new byte[WinNT.MAX_PATH];
+
+            // 根据模块的基址创建模块句柄
+            WinNT.HANDLE handle = new WinNT.HANDLE(moduleInfo.lpBaseOfDll);
+
+            // 获取模块文件名并存储在 buffer 中
+            Psapi.INSTANCE.GetModuleFileNameExA(process, handle, buffer, buffer.length);
+
+            // 截取字符串，去除多余的字节，得到模块文件名
+            byte[] trimmedBytes = ArrayUtil.sub(buffer, 0, ArrayUtil.indexOf(buffer, (byte) 0));
+
+            // 获得文件名
+            String fileName = new String(trimmedBytes, Charset.defaultCharset());
+
+            // 判断模块文件名是否以指定的模块名结尾
+            if (fileName.endsWith(WeChatServiceImpl.MODULE_NAME)) {
+                return moduleInfo;
+            }
+        }
+        // 未找到匹配的模块，返回 null
+        return null;
+    }
+
+    /**
+     * 在指定进程的指定模块中，通过模式扫描查找匹配的内存地址
+     *
+     * @param process 指定的进程句柄
+     * @param pattern 要扫描的模式字节数组
+     * @return 包含匹配的内存地址的列表
+     */
+    private List<Pointer> patternScanModule(WinNT.HANDLE process, byte[] pattern) {
+        // 用于存储找到的内存地址的列表
+        List<Pointer> foundPointers = new ArrayList<>();
+
+        // 通过模块名检索指定进程加载的模块信息
+        Psapi.MODULEINFO moduleInfo = moduleFromName(process);
+
+        // 空校验
+        if (moduleInfo == null) {
+            return foundPointers;
+        }
+
+        // 获取模块基址和模块最大地址
+        long baseAddress = Pointer.nativeValue(moduleInfo.lpBaseOfDll);
+        long maxAddress = Pointer.nativeValue(moduleInfo.lpBaseOfDll) + moduleInfo.SizeOfImage;
+        long pageAddress = baseAddress;
+
+        // 循环扫描模块内存页
+        while (pageAddress < maxAddress) {
+            // 扫描当前页的模式，并返回下一个扫描的起始地址和匹配的内存地址列表
+            Pair<Long, List<Pointer>> pair = scanPatternPage(process, pageAddress, pattern);
+            pageAddress = pair.getLeft();
+
+            // 如果找到了匹配的内存地址，则添加到列表中
+            if (pair.getRight() != null) {
+                foundPointers.addAll(pair.getRight());
+            }
+        }
+        // 返回找到的内存地址列表
+        return foundPointers;
     }
 
     /**
@@ -344,7 +591,7 @@ public class WeChatServiceImpl implements WeChatService {
                 // 通过文件分隔符分割
                 String[] newData = data.split("\\\\");
                 // 取最后一个为微信Id
-                return newData[newData.length-1];
+                return newData[newData.length - 1];
             }
         }
         // 关闭目标进程句柄
@@ -371,7 +618,7 @@ public class WeChatServiceImpl implements WeChatService {
         // 循环扫描直到达到用户空间限制或找到足够的匹配位置
         while (nextRegion < userSpaceLimit) {
             // 执行单页扫描，获取扫描结果
-            Pair<Long, List<Pointer>> pair = scanPatternPage(process, nextRegion, pattern);
+            Pair<Long, List<Pointer>> pair = scanPatternPage(process, nextRegion, pattern.getBytes());
             // 更新下一个扫描位置
             nextRegion = pair.getLeft();
             // 获取单页扫描的匹配位置列表
@@ -398,7 +645,7 @@ public class WeChatServiceImpl implements WeChatService {
      * @param pattern      要匹配的模式字符串
      * @return Pair
      */
-    private Pair<Long, List<Pointer>> scanPatternPage(WinNT.HANDLE process, long startAddress, String pattern) {
+    private Pair<Long, List<Pointer>> scanPatternPage(WinNT.HANDLE process, long startAddress, byte[] pattern) {
         // 获取内存基本信息
         WinNT.MEMORY_BASIC_INFORMATION mbi = new WinNT.MEMORY_BASIC_INFORMATION();
         // 查询指定虚拟内存地址
@@ -425,7 +672,7 @@ public class WeChatServiceImpl implements WeChatService {
         byte[] buffer = memory.getByteArray(0, bytesRead.getValue());
 
         // 查找匹配的模式在内存中的起始位置
-        for (int start : findMatches(buffer, pattern.getBytes())) {
+        for (int start : findMatches(buffer, pattern)) {
             foundPointer.add(new Pointer(startAddress + start));
         }
         return Pair.of(nextRegion, foundPointer);

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
-import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
@@ -83,14 +82,14 @@ public class DecryptServiceImpl implements DecryptService {
             byte[] firstPageReservedSegment = Arrays.copyOfRange(firstPage, firstPage.length - 48, firstPage.length);
 
             // 生成key
-            byte[] key = Pbkdf2HmacUtil.pbkdf2Hmac(ALGORITHM, HexUtil.decodeHex(password), salt, ITERATIONS, HASH_KEY_LENGTH);
+            byte[] key = Pbkdf2HmacUtil.pbkdf2Hmac(HexUtil.decodeHex(password), salt, ITERATIONS, HASH_KEY_LENGTH);
 
             byte[] macSalt = new byte[salt.length];
             for (int i = 0; i < salt.length; i++) {
                 macSalt[i] = (byte) (salt[i] ^ 58);
             }
             // 秘钥匹配成功
-            if (checkKey(key, macSalt, firstPageHashMac, firstPageBodyAndIv)) {
+            if (Pbkdf2HmacUtil.checkKey(key, macSalt, firstPageHashMac, firstPageBodyAndIv)) {
                 File outputFile = new File(decryptBO.getOutput());
                 File parentDir = outputFile.getParentFile();
 
@@ -153,29 +152,5 @@ public class DecryptServiceImpl implements DecryptService {
             pages.add(slice);
         }
         return pages;
-    }
-
-    /**
-     * 检查密钥是否有效
-     *
-     * @param byteKey 密钥的字节数组
-     * @param macSalt MAC盐值
-     * @param hashMac 预期的MAC哈希值
-     * @param message 消息内容
-     * @return 如果密钥有效返回true，否则返回false
-     * @throws Exception 抛出异常
-     */
-    private boolean checkKey(byte[] byteKey, byte[] macSalt, byte[] hashMac, byte[] message) throws Exception {
-        // 使用PBKDF2算法生成MAC密钥
-        byte[] macKey = Pbkdf2HmacUtil.pbkdf2Hmac(ALGORITHM, byteKey, macSalt, 2, 32);
-        Mac mac = Mac.getInstance(ALGORITHM);
-        SecretKeySpec keySpec = new SecretKeySpec(macKey, ALGORITHM);
-        mac.init(keySpec);
-        // 更新MAC计算的消息内容
-        mac.update(message);
-        // 添加额外的数据到消息中
-        mac.update(new byte[]{1, 0, 0, 0});
-        // 比较计算出的MAC值和预期的MAC值是否相同
-        return Arrays.equals(hashMac, mac.doFinal());
     }
 }
