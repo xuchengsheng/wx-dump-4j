@@ -27,6 +27,5 @@ public class WeChatOffsetProperties {
         private Long nickname;
         private Long account;
         private Long mobile;
-        private Long key;
     }
 }

@@ -137,6 +137,7 @@ const Contact: React.FC = () => {
         options={false}
         pagination={{
           pageSize: 10,
+          showSizeChanger: false
         }}
         headerTitle="会话列表"
         toolBarRender={() => [

@@ -137,7 +137,7 @@ public class WeChatServiceImpl implements WeChatService {
      * @return 如果前三位相同返回 true，否则返回 false
      */
     private boolean isMatchingPrefix(String version1, String version2) {
-        return version1.substring(0, 7).equals(version2.substring(0, 7));
+        return version1.substring(0, 5).equals(version2.substring(0, 5));
     }
 
     /**

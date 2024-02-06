@@ -21,7 +21,7 @@ const ChatRoom: React.FC = () => {
   const [chatRoomDetail, setChatRoomDetail] = useState<ChatRoomDetail>();
   const [userName, setUserName] = useState<string>();
   const [nickName, setNickName] = useState<string>();
-
+  
   const { Text } = Typography;
 
   const handleChatDetail = (record: ChatRoomItem) => {
@@ -157,6 +157,7 @@ const ChatRoom: React.FC = () => {
         options={false}
         pagination={{
           pageSize: 10,
+          showSizeChanger: false
         }}
         headerTitle="群聊列表"
         toolBarRender={() => [

@@ -30,6 +30,7 @@ const Feeds: React.FC = () => {
         itemLayout="vertical"
         pagination={{
           pageSize: 5,
+          showSizeChanger: false
         }}
         metas={{
           title: {
