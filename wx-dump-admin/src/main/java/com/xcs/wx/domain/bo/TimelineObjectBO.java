@@ -3,6 +3,7 @@ package com.xcs.wx.domain.bo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.Data;
 
 import java.util.List;
@@ -150,13 +151,39 @@ public class TimelineObjectBO {
             private String videoSize;
 
             @JacksonXmlProperty(localName = "url")
-            private String url;
+            private Url url;
 
             @JacksonXmlProperty(localName = "thumb")
-            private String thumb;
+            private Thumb thumb;
 
             @JacksonXmlProperty(localName = "size")
             private String size;
+        }
+
+        @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class Url {
+            @JacksonXmlProperty(isAttribute = true)
+            private int type;
+
+            @JacksonXmlProperty(isAttribute = true)
+            private String md5;
+
+            @JacksonXmlProperty(isAttribute = true)
+            private String videomd5;
+
+            @JacksonXmlText
+            private String value;
+        }
+
+        @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class Thumb {
+            @JacksonXmlProperty(isAttribute = true)
+            private int type;
+
+            @JacksonXmlText
+            private String value;
         }
     }
 

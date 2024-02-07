@@ -10,9 +10,7 @@ import com.xcs.wx.domain.vo.FeedsMediaVO;
 import com.xcs.wx.domain.vo.FeedsVO;
 import com.xcs.wx.domain.vo.PageVO;
 import com.xcs.wx.mapping.FeedsMapping;
-import com.xcs.wx.repository.ContactHeadImgUrlRepository;
-import com.xcs.wx.repository.ContactRepository;
-import com.xcs.wx.repository.FeedsRepository;
+import com.xcs.wx.repository.*;
 import com.xcs.wx.service.FeedsService;
 import com.xcs.wx.util.XmlUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +34,8 @@ public class FeedsServiceImpl implements FeedsService {
     private final FeedsMapping feedsMapping;
     private final ContactRepository contactRepository;
     private final ContactHeadImgUrlRepository contactHeadImgUrlRepository;
+    private final HardLinkVideoAttributeRepository hardLinkVideoAttributeRepository;
+    private final HardLinkImageAttributeRepository hardLinkImageAttributeRepository;
 
     @Override
     public PageVO<FeedsVO> queryFeeds(FeedsDTO feedsDTO) {
@@ -63,28 +63,25 @@ public class FeedsServiceImpl implements FeedsService {
                                 return feedsVO;
                             })
                             // 处理日期
-                            .map(feedsVO -> {
+                            .peek(feedsVO -> {
                                 // 转换日期
                                 String strCreateTime = DateUtil.formatDateTime(new Date(feedsVO.getCreateTime() * 1000L));
                                 // 设置日期
                                 feedsVO.setStrCreateTime(strCreateTime);
-                                return feedsVO;
                             })
                             // 处理联系人名称
-                            .map(feedsVO -> {
+                            .peek(feedsVO -> {
                                 // 查询用户名
                                 String nickname = contactRepository.getContactNickname(feedsVO.getUserName());
                                 // 设置用户名
                                 feedsVO.setNickName(nickname);
-                                return feedsVO;
                             })
                             // 处理联系人头像
-                            .map(feedsVO -> {
+                            .peek(feedsVO -> {
                                 // 联系人头像
                                 String headImgUrl = contactHeadImgUrlRepository.queryHeadImgUrlByUserName(feedsVO.getUserName());
                                 // 设置联系人头像
                                 feedsVO.setHeadImgUrl(headImgUrl);
-                                return feedsVO;
                             })
                             // 转换成List
                             .collect(Collectors.toList());
@@ -113,11 +110,10 @@ public class FeedsServiceImpl implements FeedsService {
 
         for (TimelineObjectBO.ContentObject.Media media : mediaList) {
             FeedsMediaVO feedsMediaVo = new FeedsMediaVO();
-            feedsMediaVo.setUrl(media.getUrl());
-            feedsMediaVo.setThumb(media.getThumb());
+            feedsMediaVo.setUrl(media.getUrl().getValue());
+            feedsMediaVo.setThumb(media.getThumb().getValue());
             feedsMediaVos.add(feedsMediaVo);
         }
-
         return feedsMediaVos;
     }
 

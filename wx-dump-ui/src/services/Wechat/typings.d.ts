@@ -13,6 +13,11 @@ interface ContactLabelItem {
   labelName: string;
 }
 
+interface AllContactItem {
+  userName: string;
+  nickName: string;
+}
+
 type ContactParams = {
   current?: number;
   pageSize?: number;

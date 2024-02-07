@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xcs.wx.domain.Contact;
 import com.xcs.wx.domain.dto.ContactDTO;
+import com.xcs.wx.domain.vo.AllContactVO;
 import com.xcs.wx.domain.vo.ContactVO;
 import com.xcs.wx.domain.vo.ExportContactVO;
 import org.apache.ibatis.annotations.Param;
@@ -28,9 +29,16 @@ public interface ContactMapper extends BaseMapper<Contact> {
     Page<ContactVO> queryContact(Page<ContactVO> page, @Param("contactDTO") ContactDTO contactDTO);
 
     /**
+     * 查询所有联系人
+     *
+     * @return AllContactVO
+     */
+    List<AllContactVO> queryAllContact();
+
+    /**
      * 统计联系人数量
      *
-     * @return
+     * @return 联系人数量
      */
     int countContact();
 

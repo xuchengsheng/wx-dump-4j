@@ -1,10 +1,7 @@
 package com.xcs.wx.controller;
 
 import com.xcs.wx.domain.dto.ContactDTO;
-import com.xcs.wx.domain.vo.ContactLabelVO;
-import com.xcs.wx.domain.vo.ContactVO;
-import com.xcs.wx.domain.vo.PageVO;
-import com.xcs.wx.domain.vo.ResponseVO;
+import com.xcs.wx.domain.vo.*;
 import com.xcs.wx.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +35,16 @@ public class ContactController {
         PageVO<ContactVO> pageVO = contactService.queryContact(contactDTO);
         // 返回数据
         return ResponseVO.ok(pageVO.getRecords(), pageVO.getCurrent(), pageVO.getTotal());
+    }
+
+    /**
+     * 查询所有联系人
+     *
+     * @return ResponseVO
+     */
+    @GetMapping("/all")
+    public ResponseVO<List<AllContactVO>> all() {
+        return ResponseVO.ok(contactService.queryAllContact());
     }
 
     /**

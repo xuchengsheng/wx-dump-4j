@@ -36,6 +36,21 @@
             ORDER BY COALESCE(NULLIF(RemarkPYInitial, ''), PYInitial)
     </select>
 
+    <!-- 查询所有联系人 -->
+    <select id="queryAllContact" resultType="com.xcs.wx.domain.vo.AllContactVO">
+        SELECT
+            c.UserName as userName,
+            CASE WHEN c.Remark IS NULL OR c.Remark = '' THEN c.NickName ELSE c.Remark END AS nickName
+        FROM
+            Contact c
+        WHERE
+            Type % 2 = 1
+          AND VerifyFlag = 0
+          AND UserName NOT IN ( 'floatbottle', 'fmessage', 'medianote','filehelper' )
+          AND UserName NOT LIKE '%@chatroom'
+        ORDER BY COALESCE(NULLIF(RemarkPYInitial, ''), PYInitial)
+    </select>
+
     <!-- 统计联系人数量 -->
     <select id="countContact" resultType="java.lang.Integer">
         SELECT

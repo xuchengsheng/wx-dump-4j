@@ -1,6 +1,7 @@
 package com.xcs.wx.service;
 
 import com.xcs.wx.domain.dto.ContactDTO;
+import com.xcs.wx.domain.vo.AllContactVO;
 import com.xcs.wx.domain.vo.ContactLabelVO;
 import com.xcs.wx.domain.vo.ContactVO;
 import com.xcs.wx.domain.vo.PageVO;
@@ -22,6 +23,13 @@ public interface ContactService {
      * @return ContactVO
      */
     PageVO<ContactVO> queryContact(ContactDTO contactDTO);
+
+    /**
+     * 查询所有联系人
+     *
+     * @return AllContactVO
+     */
+    List<AllContactVO> queryAllContact();
 
     /**
      * 查询联系人标签

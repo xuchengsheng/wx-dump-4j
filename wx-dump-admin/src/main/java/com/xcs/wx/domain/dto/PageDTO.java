@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2023年12月29日 15时58分
  **/
 @Data
-public class PageDTO<T> {
+public class PageDTO{
 
     /**
      * 当前页数
@@ -18,9 +18,4 @@ public class PageDTO<T> {
      * 页数大小
      */
     private Long pageSize;
-
-    /**
-     * 查询条件
-     */
-    private T condition;
 }

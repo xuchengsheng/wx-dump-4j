@@ -1,9 +1,12 @@
 import { queryFeeds } from '@/services/Wechat/Feeds';
+import { queryAllContact } from '@/services/Wechat/Contact';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { PageContainer, ProList } from '@ant-design/pro-components';
 import { Avatar, Col, Flex, Image, Row, Typography } from 'antd';
 import React from 'react';
 import './Style/Feeds.less';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 
 const IconText = ({ icon, text }: { icon: any; text: string }) => (
   <span>
@@ -14,7 +17,28 @@ const IconText = ({ icon, text }: { icon: any; text: string }) => (
 
 const { Text, Link } = Typography;
 
+
 const Feeds: React.FC = () => {
+  const [allContact, setAllContact] = useState<{ [key: string]: { text: string } }>({});
+
+  const getAllContact = async () => {
+    try {
+      const response = await queryAllContact();
+      const result = response.data.reduce<{ [key: string]: { text: string } }>((acc, curr) => {
+        acc[curr.userName] = { text: curr.nickName };
+        return acc;
+      }, {});
+      setAllContact(result);
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllContact();
+  }, []);
+
   return (
     <PageContainer>
       <ProList<FeedsItem>
@@ -26,6 +50,7 @@ const Feeds: React.FC = () => {
             return [];
           }
         }}
+        search={{}}
         bordered
         itemLayout="vertical"
         pagination={{
@@ -35,6 +60,27 @@ const Feeds: React.FC = () => {
         metas={{
           title: {
             dataIndex: 'nickName',
+            search: false,
+          },
+          userName: {
+            title: '用户名',
+            valueType: 'select',
+            dataIndex: 'userName',
+            valueEnum: allContact,
+          },
+          strCreateTime:{
+            title: '创建时间',
+            key: 'createdAtRange',
+            dataIndex: 'createdAtRange',
+            valueType: 'dateRange',
+            search: {
+              transform: (value) => {
+                return {
+                  startTime: dayjs(value[0]).unix(),
+                  endTime: dayjs(value[1]).add(1, 'day').unix(),
+                };
+              },
+            },
           },
           avatar: {
             dataIndex: 'headImgUrl',
@@ -55,6 +101,7 @@ const Feeds: React.FC = () => {
             ],
           },
           content: {
+            search: false,
             render: (_, record) => {
               return (
                 <Flex vertical>

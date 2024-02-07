@@ -51,6 +51,7 @@
     "@umijs/route-utils": "^2.2.2",
     "antd": "^5.2.2",
     "classnames": "^2.3.2",
+    "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "omit.js": "^2.0.2",

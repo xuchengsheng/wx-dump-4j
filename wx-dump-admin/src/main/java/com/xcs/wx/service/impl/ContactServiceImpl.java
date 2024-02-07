@@ -5,10 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.xcs.wx.domain.dto.ContactDTO;
-import com.xcs.wx.domain.vo.ContactLabelVO;
-import com.xcs.wx.domain.vo.ContactVO;
-import com.xcs.wx.domain.vo.ExportContactVO;
-import com.xcs.wx.domain.vo.PageVO;
+import com.xcs.wx.domain.vo.*;
 import com.xcs.wx.mapping.ContactLabelMapping;
 import com.xcs.wx.repository.ContactLabelRepository;
 import com.xcs.wx.repository.ContactRepository;
@@ -53,6 +50,11 @@ public class ContactServiceImpl implements ContactService {
                 })
                 // 默认值
                 .orElse(new PageVO<>(contactDTO.getCurrent(), contactDTO.getPageSize(), 0L, null));
+    }
+
+    @Override
+    public List<AllContactVO> queryAllContact() {
+        return contactRepository.queryAllContact();
     }
 
     @Override

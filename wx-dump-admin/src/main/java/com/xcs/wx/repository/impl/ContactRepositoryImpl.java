@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xcs.wx.constant.DataSourceType;
 import com.xcs.wx.domain.Contact;
 import com.xcs.wx.domain.dto.ContactDTO;
+import com.xcs.wx.domain.vo.AllContactVO;
 import com.xcs.wx.domain.vo.ContactVO;
 import com.xcs.wx.domain.vo.ExportContactVO;
 import com.xcs.wx.mapper.ContactMapper;
@@ -34,6 +35,11 @@ public class ContactRepositoryImpl extends ServiceImpl<ContactMapper, Contact> i
     @Override
     public Page<ContactVO> queryContact(ContactDTO contactDTO) {
         return getBaseMapper().queryContact(new Page<>(contactDTO.getCurrent(), contactDTO.getPageSize()), contactDTO);
+    }
+
+    @Override
+    public List<AllContactVO> queryAllContact() {
+        return getBaseMapper().queryAllContact();
     }
 
     @Override

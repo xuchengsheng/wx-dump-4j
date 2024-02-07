@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.HardLinkVideoAttributeMapper">
+
+    <!-- 查询视频 -->
+    <select id="queryHardLinkVideo" resultType="java.lang.String">
+        SELECT
+           '\\FileStorage\MsgAttach\\' || hlv1.Dir || '\\' || 'Image' || '\\' || hlv2.Dir || '\\' || hlva.FileName
+        FROM
+            HardLinkVideoAttribute hlva
+            LEFT JOIN HardLinkVideoID hlv1 ON hlva.DirID1 = hlv1.DirId
+            LEFT JOIN HardLinkVideoID hlv2 ON hlva.DirID2 = hlv2.DirId
+        WHERE
+            hlva.Md5=#{md5} LIMIT 1
+    </select>
+</mapper>

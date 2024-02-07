@@ -1,5 +1,7 @@
 package com.xcs.wx.repository.impl;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -22,10 +24,14 @@ public class FeedsRepositoryImpl extends ServiceImpl<FeedsMapper, Feeds> impleme
 
     @Override
     public Page<Feeds> queryFeeds(FeedsDTO feedsDTO) {
+        boolean conditionUserName = StrUtil.isNotBlank(feedsDTO.getUserName());
+        boolean conditionCreateTime = ObjUtil.isNotEmpty(feedsDTO.getStartTime()) && ObjUtil.isNotEmpty(feedsDTO.getEndTime());
+
         // 构建查询条件
         LambdaQueryWrapper<Feeds> wrapper = Wrappers.<Feeds>lambdaQuery()
+                .eq(conditionUserName, Feeds::getUserName, feedsDTO.getUserName())
+                .between(conditionCreateTime, Feeds::getCreateTime, feedsDTO.getStartTime(), feedsDTO.getEndTime())
                 .orderByDesc(Feeds::getCreateTime);
-
         return super.page(new Page<>(feedsDTO.getCurrent(), feedsDTO.getPageSize()), wrapper);
     }
 }
