@@ -1,6 +1,7 @@
 import { msgTypeDistribution } from '@/services/Wechat/DashBoard';
 import { Pie } from '@ant-design/plots';
 import React, { useEffect, useState } from 'react';
+import {sum} from "@antfu/utils";
 
 const MsgCategory: React.FC = () => {
   const [data, setData] = useState<MsgTypeDistributionItem[]>([]);
@@ -24,7 +25,16 @@ const MsgCategory: React.FC = () => {
     colorField: 'type',
     radius: 0.9,
     tooltip: {
-      title: 'value',
+      title: 'type',
+      items:[{
+        field: 'value',
+        name: '数量',
+      },{
+        field: 'value',
+        valueFormatter: (d: number) => `${(d / sum(data.map(item => item.value)) * 100).toFixed(1) + '%'}`,
+        name: '占比',
+        color:''
+      },],
     },
     legend: {
       color: {
