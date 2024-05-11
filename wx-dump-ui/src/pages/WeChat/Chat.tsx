@@ -98,7 +98,10 @@ const Chat: React.FC<ChatProps> = ({ userName }) => {
                           >
                             <Image
                               width={200}
-                              src={`/api/image/downloadImgMd5?md5=${item.imgMd5}`}
+                              src={`/api/image/downloadImgFormLocal?localPath=${encodeURIComponent(item.thumb)}`}
+                              preview={{
+                                src: `/api/image/downloadImgFormLocal?localPath=${encodeURIComponent(item.image)}`,
+                              }}
                               placeholder={
                                 <Flex justify="center">
                                   <Spin size="small" />

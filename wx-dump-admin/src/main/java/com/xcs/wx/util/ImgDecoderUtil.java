@@ -134,4 +134,8 @@ public class ImgDecoderUtil {
         // 如果没有匹配的文件类型，返回错误代码
         return new int[]{-1, -1};
     }
+
+    public static void main(String[] args) {
+        decodeDat("D:\\WeChat Files\\WeChat Files\\wxid_esfvm4299gsy22\\FileStorage\\MsgAttach\\38f147c34e7f97ff0788ed689e54587a\\Thumb\\2024-04\\43e489a118b3908440e4ec14964047c5_t.dat","D:\\");
+    }
 }

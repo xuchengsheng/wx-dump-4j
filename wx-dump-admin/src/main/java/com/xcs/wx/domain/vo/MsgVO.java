@@ -71,6 +71,16 @@ public class MsgVO {
     private String imgMd5;
 
     /**
+     * 图片缩略图
+     */
+    private String thumb;
+
+    /**
+     * 图片
+     */
+    private String image;
+
+    /**
      * 表情Url
      */
     private String emojiUrl;

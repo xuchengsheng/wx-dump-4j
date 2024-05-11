@@ -8,6 +8,7 @@ import com.xcs.wx.util.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
 /**
  * 图片消息
  *
@@ -25,11 +26,14 @@ public class ImageMsgStrategy implements MsgStrategy {
 
     @Override
     public void process(MsgVO msgVO) {
-        Opt.ofNullable(msgVO.getStrContent())
-                .map(xmlContent -> XmlUtil.parseXml(xmlContent, MsgBO.class))
-                .ifPresent(msgBO -> {
+        Opt.ofNullable(msgVO.getBytesExtra())
+                .map(xmlContent -> new String(msgVO.getBytesExtra()))
+                .ifPresent(extra -> {
+                    String image = extra.substring(extra.indexOf("}") + 1, extra.indexOf(".dat") + 4);
+                    String thumb = extra.substring(extra.lastIndexOf(image.substring(0, image.indexOf("\\"))), extra.lastIndexOf(".dat") + 4);
+                    msgVO.setImage(image);
+                    msgVO.setThumb(thumb);
                     msgVO.setStrContent("[图片]");
-                    msgVO.setImgMd5(msgBO.getImg().getMd5());
                 });
     }
 }

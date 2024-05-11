@@ -28,14 +28,14 @@ public class ImageController {
     private final ImageService imageService;
 
     /**
-     * 根据Md5下载图片
+     * 根据路径下载图片
      *
-     * @param md5 Md5值
+     * @param path Md5值
      * @return 图片
      */
-    @GetMapping("/downloadImgMd5")
-    public ResponseEntity<Resource> downloadImgMd5(@RequestParam String md5) throws IOException {
-        String imgUrl = imageService.downloadImgMd5(md5);
+    @GetMapping("/downloadImg")
+    public ResponseEntity<Resource> downloadImg(@RequestParam String path) throws IOException {
+        String imgUrl = imageService.downloadImg(path);
         InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
@@ -45,12 +45,12 @@ public class ImageController {
     /**
      * 根据路径下载图片
      *
-     * @param path Md5值
+     * @param localPath 本地图片
      * @return 图片
      */
-    @GetMapping("/downloadImg")
-    public ResponseEntity<Resource> downloadImg(@RequestParam String path) throws IOException {
-        String imgUrl = imageService.downloadImg(path);
+    @GetMapping("/downloadImgFormLocal")
+    public ResponseEntity<Resource> downloadImgFormLocal(@RequestParam String localPath) throws IOException {
+        String imgUrl = imageService.downloadImgFormLocal(localPath);
         InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)

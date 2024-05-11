@@ -153,6 +153,8 @@ interface MsgItem {
   createTime: number;
   strCreateTime: string;
   imgMd5: string;
+  image: string;
+  thumb: string;
   emojiUrl: string;
   strContent: string;
   avatar: string;
