@@ -1,12 +1,17 @@
 package com.xcs.wx.msg.impl;
 
 import cn.hutool.core.lang.Opt;
+import cn.hutool.core.util.ReUtil;
 import com.xcs.wx.domain.bo.MsgBO;
 import com.xcs.wx.domain.vo.MsgVO;
 import com.xcs.wx.msg.MsgStrategy;
 import com.xcs.wx.util.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -29,8 +34,8 @@ public class ImageMsgStrategy implements MsgStrategy {
         Opt.ofNullable(msgVO.getBytesExtra())
                 .map(xmlContent -> new String(msgVO.getBytesExtra()))
                 .ifPresent(extra -> {
-                    String image = extra.substring(extra.indexOf("}") + 1, extra.indexOf(".dat") + 4);
-                    String thumb = extra.substring(extra.lastIndexOf(image.substring(0, image.indexOf("\\"))), extra.lastIndexOf(".dat") + 4);
+                    String thumb = ReUtil.getGroup0("FileStorage\\\\MsgAttach\\\\[^\\\\]+\\\\Thumb\\\\[^\\\\]+\\\\[^\\\\]+\\.dat", extra);
+                    String image = ReUtil.getGroup0("FileStorage\\\\MsgAttach\\\\[^\\\\]+\\\\Image\\\\[^\\\\]+\\\\[^\\\\]+\\.dat", extra);
                     msgVO.setImage(image);
                     msgVO.setThumb(thumb);
                     msgVO.setStrContent("[图片]");

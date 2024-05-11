@@ -28,6 +28,21 @@ public class ImageController {
     private final ImageService imageService;
 
     /**
+     * 根据Md5下载图片
+     *
+     * @param md5 Md5值
+     * @return 图片
+     */
+    @GetMapping("/downloadImgMd5")
+    public ResponseEntity<Resource> downloadImgMd5(@RequestParam String md5) throws IOException {
+        String imgUrl = imageService.downloadImgMd5(md5);
+        InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(imageStream);
+    }
+
+    /**
      * 根据路径下载图片
      *
      * @param path Md5值
