@@ -138,5 +138,5 @@
 关注后，回复关键字 “加群”，即可加入我们的技术交流群，与更多开发者一起交流学习。
 
 <div>
-<img alt="logo" src="image/wechat-mp.png" style="width: 280px;height: 320px">
+<img alt="logo" src="image/wechat-mp.png">
 </div>
