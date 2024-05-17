@@ -1,4 +1,4 @@
-@echo off & setlocal enabledelayedexpansion
+﻿@echo off & setlocal enabledelayedexpansion
 
 cd %~dp0
 
