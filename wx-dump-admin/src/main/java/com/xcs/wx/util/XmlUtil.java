@@ -31,7 +31,7 @@ public class XmlUtil {
             }
             return MAPPER.readValue(content, valueType);
         } catch (JsonProcessingException e) {
-            log.error("解析XML失败", e);
+            log.error("Parsing XML failed", e);
         }
         return null;
     }

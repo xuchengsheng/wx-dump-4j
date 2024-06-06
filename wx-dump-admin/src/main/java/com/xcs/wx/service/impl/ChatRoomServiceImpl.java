@@ -157,7 +157,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             // 群成员
             chatRoomDetailVo.setMembers(chatRoomMapping.convert(membersList, headImgUrlMap, contactNicknameMap));
         } catch (InvalidProtocolBufferException e) {
-            log.error("解析RoomData失败,群聊名称:{},群聊标题:{},错误信息:{}", chatRoomDetailVo.getChatRoomName(), chatRoomDetailVo.getChatRoomTitle(), e);
+            log.error("Failed to parse RoomData",  e);
         }
     }
 

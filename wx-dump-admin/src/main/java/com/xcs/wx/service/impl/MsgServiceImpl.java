@@ -139,7 +139,7 @@ public class MsgServiceImpl implements MsgService {
                 }
             }
         } catch (InvalidProtocolBufferException e) {
-            log.error("获取对话人Id失败", e);
+            log.error("Failed to obtain the conversationalist Id", e);
         }
         return talker;
     }

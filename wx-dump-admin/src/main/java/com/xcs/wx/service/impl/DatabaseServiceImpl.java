@@ -99,7 +99,7 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
             // 合并聊天记录
             mergeMsg();
         } catch (Exception e) {
-            log.error("Sqlite数据库解密失败", e);
+            log.error("Sqlite database decryption failed", e);
         }
     }
 

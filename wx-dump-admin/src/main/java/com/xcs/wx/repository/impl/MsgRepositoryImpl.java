@@ -50,21 +50,21 @@ public class MsgRepositoryImpl extends ServiceImpl<MsgMapper, Msg> implements Ms
 
     @Override
     public List<Msg> queryMsgBySequence(String poolName, Long nextSequence) {
-        log.info("开始查询数据:[{}][{}]", poolName, nextSequence);
+        log.info("Start querying data:[{}][{}]", poolName, nextSequence);
         // 切换数据源
         DynamicDataSourceContextHolder.push(poolName);
         // 根据数量与序列号获取消息
         List<Msg> msgs = getBaseMapper().queryMsgBySequence(nextSequence);
         // 清理动态数据源
         DynamicDataSourceContextHolder.clear();
-        log.info("结束查询数据:[{}][{}]", poolName, nextSequence);
+        log.info("End querying data:[{}][{}]", poolName, nextSequence);
         // 返回数据
         return msgs;
     }
 
     @Override
     public boolean saveBatch(String poolName, List<Msg> msg) {
-        log.info("开始新增数据:[{}][{}]", poolName, msg.size());
+        log.info("Start adding new data:[{}][{}]", poolName, msg.size());
         // 切换数据源
         DynamicDataSourceContextHolder.push(poolName);
         // 批量执行
@@ -74,7 +74,7 @@ public class MsgRepositoryImpl extends ServiceImpl<MsgMapper, Msg> implements Ms
         });
         // 清理动态数据源
         DynamicDataSourceContextHolder.clear();
-        log.info("结束新增数据:[{}][{}]", poolName, msg.size());
+        log.info("End adding new data:[{}][{}]", poolName, msg.size());
         // 返回数据
         return true;
     }
