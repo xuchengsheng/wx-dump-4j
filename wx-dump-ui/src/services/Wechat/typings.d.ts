@@ -26,6 +26,12 @@ type ContactParams = {
   labelId?: string;
 };
 
+type DecryptParams = {
+  key?: string;
+  basePath?: string;
+  wxId?: string;
+};
+
 interface ContactItem {
   userName: string;
   alias: string;
@@ -137,7 +143,7 @@ interface SessionItem {
 
 type MsgParams = {
   talker?: string;
-  lastCreateTime?: number;
+  nextSequence?: number;
 };
 
 type ExportMsgParams = {
@@ -151,6 +157,7 @@ interface MsgItem {
   subType: number;
   isSender: number;
   createTime: number;
+  sequence: number;
   strCreateTime: string;
   imgMd5: string;
   image: string;

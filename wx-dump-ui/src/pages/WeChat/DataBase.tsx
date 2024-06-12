@@ -1,7 +1,7 @@
-import { decrypt, queryWeChat } from '@/services/Wechat/DataBase';
-import { SyncOutlined } from '@ant-design/icons';
-import { Button, Descriptions, Flex, Modal, notification, Space, Spin } from 'antd';
-import React, { useState } from 'react';
+import {decrypt, queryWeChat} from '@/services/Wechat/DataBase';
+import {SyncOutlined} from '@ant-design/icons';
+import {Button, Descriptions, Flex, Modal, notification, Space, Spin} from 'antd';
+import React, {useState} from 'react';
 
 const DataBase: React.FC = () => {
   const [isDecryptOpen, setIsDecryptOpen] = useState(false);
@@ -52,7 +52,7 @@ const DataBase: React.FC = () => {
   const handelDataBaseDecrypt = async () => {
     try {
       setIsDecrypt(true);
-      const response = await decrypt();
+      const response = await decrypt({"key": wechat?.key, "basePath": wechat?.basePath, "wxId": wechat?.wxId});
       if (response.success) {
         decryptSuccess();
       } else {
@@ -69,7 +69,7 @@ const DataBase: React.FC = () => {
     <>
       {contextHolder}
       <Flex onClick={() => hanldelWeChat()}>
-        <SyncOutlined spin />
+        <SyncOutlined spin/>
       </Flex>
       <Modal
         width={850}
@@ -80,7 +80,7 @@ const DataBase: React.FC = () => {
         onCancel={handleCancel}
       >
         <Spin tip="数据加载中..." spinning={isQueryWeChat}>
-          <Descriptions layout="vertical" column={4} style={{ marginTop: 20 }}>
+          <Descriptions layout="vertical" column={4} style={{marginTop: 20}}>
             <Descriptions.Item label="进程Id">{wechat?.pid}</Descriptions.Item>
             <Descriptions.Item label="基址">{wechat?.baseAddress}</Descriptions.Item>
             <Descriptions.Item label="版本号">{wechat?.version}</Descriptions.Item>

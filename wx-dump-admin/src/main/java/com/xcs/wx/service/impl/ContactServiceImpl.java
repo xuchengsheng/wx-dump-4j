@@ -13,6 +13,7 @@ import com.xcs.wx.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.FileSystems;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,9 +71,9 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public String exportContact() {
         // 分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
-        String filePath = System.getProperty("user.dir") + separator + "export";
+        String filePath = System.getProperty("user.dir") + separator + "data" + separator + "export";
         // 创建文件
         FileUtil.mkdir(filePath);
         // 文件路径+文件名

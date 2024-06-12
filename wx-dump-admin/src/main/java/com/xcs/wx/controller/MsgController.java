@@ -27,13 +27,13 @@ public class MsgController {
     /**
      * 查询消息
      *
-     * @param talker  对话着
-     * @param lastCreateTime 创建时间
+     * @param talker       对话着
+     * @param nextSequence 下一个序列号
      * @return ResponseVO
      */
     @GetMapping("/list")
-    public ResponseVO<List<MsgVO>> list(@RequestParam String talker, @RequestParam Long lastCreateTime) {
-        return ResponseVO.ok(msgService.queryMsg(talker, lastCreateTime));
+    public ResponseVO<List<MsgVO>> list(@RequestParam String talker, @RequestParam Long nextSequence) {
+        return ResponseVO.ok(msgService.queryMsg(talker, nextSequence));
     }
 
     /**

@@ -12,12 +12,12 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * 解密服务实现类
@@ -36,11 +36,6 @@ public class DecryptServiceImpl implements DecryptService {
     private static final String SQLITE_FILE_HEADER = "SQLite format 3\u0000";
 
     /**
-     * 算法
-     */
-    private static final String ALGORITHM = "HmacSHA1";
-
-    /**
      * 一页的大小
      */
     private static final int DEFAULT_PAGESIZE = 4096;
@@ -57,19 +52,22 @@ public class DecryptServiceImpl implements DecryptService {
 
     @Override
     public void wechatDecrypt(String password, DecryptBO decryptBO) {
+        long start = System.currentTimeMillis();
         // 创建File文件
         File file = new File(decryptBO.getInput());
 
-        try (FileInputStream fis = new FileInputStream(file)) {
+        try (FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ)) {
             // 文件大小
-            byte[] fileContent = new byte[(int) file.length()];
-            // 读取内容
-            fis.read(fileContent);
+            long fileSize = file.length();
+            MappedByteBuffer fileContent = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileSize);
 
             // 提取盐值
-            byte[] salt = Arrays.copyOfRange(fileContent, 0, 16);
+            byte[] salt = new byte[16];
+            fileContent.get(salt);
             // 提取第一页
-            byte[] firstPage = Arrays.copyOfRange(fileContent, 16, DEFAULT_PAGESIZE);
+            byte[] firstPage = new byte[DEFAULT_PAGESIZE - 16];
+            fileContent.get(firstPage);
+
             // 提取第一页的内容与IV
             byte[] firstPageBodyAndIv = Arrays.copyOfRange(firstPage, 0, firstPage.length - 32);
             // 提取第一页的内容
@@ -99,23 +97,48 @@ public class DecryptServiceImpl implements DecryptService {
                 }
 
                 // 解密并写入新文件
-                try (FileOutputStream deFile = new FileOutputStream(outputFile)) {
-                    deFile.write(SQLITE_FILE_HEADER.getBytes());
-                    deFile.write(doDecrypt(key, firstPageIv, firstPageBody));
-                    deFile.write(firstPageReservedSegment);
+                try (FileChannel outChannel = FileChannel.open(outputFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+                    ByteBuffer headerBuffer = ByteBuffer.wrap(SQLITE_FILE_HEADER.getBytes());
+                    outChannel.write(headerBuffer);
+
+                    ByteBuffer decryptedFirstPage = ByteBuffer.wrap(doDecrypt(key, firstPageIv, firstPageBody));
+                    ByteBuffer reservedSegmentBuffer = ByteBuffer.wrap(firstPageReservedSegment);
+
+                    // 创建暂存缓冲区
+                    ByteBuffer tempBuffer = ByteBuffer.allocate((int) fileSize);
+
+                    // 写入第一页的解密内容和保留字段到暂存缓冲区
+                    tempBuffer.put(decryptedFirstPage);
+                    tempBuffer.put(reservedSegmentBuffer);
+
                     // 解密后续数据块
-                    for (byte[] page : splitDataPages(fileContent)) {
+                    while (fileContent.hasRemaining()) {
+                        byte[] page = new byte[DEFAULT_PAGESIZE];
+                        fileContent.get(page);
+
                         byte[] iv = Arrays.copyOfRange(page, page.length - 48, page.length - 32);
                         byte[] body = Arrays.copyOfRange(page, 0, page.length - 48);
                         byte[] reservedSegment = Arrays.copyOfRange(page, page.length - 48, page.length);
-                        deFile.write(doDecrypt(key, iv, body));
-                        deFile.write(reservedSegment);
+
+                        ByteBuffer decryptedBody = ByteBuffer.wrap(doDecrypt(key, iv, body));
+                        ByteBuffer reservedSegmentBuf = ByteBuffer.wrap(reservedSegment);
+
+                        // 将解密内容和保留字段写入暂存缓冲区
+                        tempBuffer.put(decryptedBody);
+                        tempBuffer.put(reservedSegmentBuf);
                     }
+
+                    // 将暂存缓冲区内容写入到输出文件
+                    tempBuffer.flip();
+                    outChannel.write(tempBuffer);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("WeChat decryption failed", e);
         }
+        long end = System.currentTimeMillis();
+
+        log.info("结束解密：" + decryptBO.getInput() + "耗时：" + (end - start) + "ms");
     }
 
     /**
@@ -133,24 +156,5 @@ public class DecryptServiceImpl implements DecryptService {
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
         return cipher.doFinal(input);
-    }
-
-    /**
-     * 将数据分割成多个页面
-     *
-     * @param fileContent 文件内容的字节数组
-     * @return 分割后的页面列表
-     */
-    private List<byte[]> splitDataPages(byte[] fileContent) {
-        List<byte[]> pages = new ArrayList<>();
-        for (int i = DEFAULT_PAGESIZE; i < fileContent.length; i += DEFAULT_PAGESIZE) {
-            // 计算每个分割页面的结束位置
-            int end = Math.min(i + DEFAULT_PAGESIZE, fileContent.length);
-            byte[] slice = new byte[end - i];
-            // 将数据复制到新的页面中
-            System.arraycopy(fileContent, i, slice, 0, slice.length);
-            pages.add(slice);
-        }
-        return pages;
     }
 }

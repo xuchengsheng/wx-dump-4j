@@ -1,5 +1,6 @@
 package com.xcs.wx.controller;
 
+import com.xcs.wx.domain.dto.DecryptDTO;
 import com.xcs.wx.domain.vo.ResponseVO;
 import com.xcs.wx.domain.vo.WeChatVO;
 import com.xcs.wx.service.DatabaseService;
@@ -29,8 +30,8 @@ public class DatabaseController {
      * @return ResponseVO
      */
     @GetMapping("/decrypt")
-    public ResponseVO<Boolean> decrypt() {
-        databaseService.decrypt();
+    public ResponseVO<Boolean> decrypt(DecryptDTO decryptDTO) {
+        databaseService.decrypt(decryptDTO);
         // 返回数据
         return ResponseVO.ok(true);
     }

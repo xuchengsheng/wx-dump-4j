@@ -16,10 +16,10 @@ public interface MsgService {
      * 查询消息
      *
      * @param talker     聊天人的Id
-     * @param createTime 创建时间
+     * @param nextSequence 下一个序列号
      * @return MsgVO
      */
-    List<MsgVO> queryMsg(String talker, Long createTime);
+    List<MsgVO> queryMsg(String talker, Long nextSequence);
 
     /**
      * 导出聊天记录

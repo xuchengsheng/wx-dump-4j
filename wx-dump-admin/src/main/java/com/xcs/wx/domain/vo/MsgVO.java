@@ -31,6 +31,11 @@ public class MsgVO {
     private Integer subType;
 
     /**
+     * 序列号
+     */
+    private Long sequence;
+
+    /**
      * 是否为发送者
      */
     private Integer isSender;

@@ -5,6 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import com.alibaba.excel.EasyExcel;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xcs.wx.constant.ChatRoomConstant;
+import com.xcs.wx.domain.Msg;
 import com.xcs.wx.domain.vo.ExportMsgVO;
 import com.xcs.wx.domain.vo.MsgVO;
 import com.xcs.wx.domain.vo.WeChatVO;
@@ -21,7 +22,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -41,74 +45,59 @@ public class MsgServiceImpl implements MsgService {
     private final ContactRepository contactRepository;
 
     @Override
-    public List<MsgVO> queryMsg(String talker, Long lastCreateTime) {
-        // 根据Id查询聊天记录
-        return Optional.ofNullable(msgRepository.queryMsgByTalker(talker, lastCreateTime))
-                // 处理消息
-                .map(msgs -> {
-                    // 获取用户信息
-                    WeChatVO user = UserUtil.getUser();
-                    // 根据时间排序
-                    return msgMapping.convert(msgs).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
-                            // 遍历数据
-                            .peek(msgVO -> {
-                                msgVO.setWxId(getChatWxId(talker, msgVO, user));
-                                // 设置处理日期
-                                msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
-                                // 设置聊天头像
-                                msgVO.setAvatar(getChatAvatar(msgVO.getWxId()));
-                                // 读取消息类型策略
-                                MsgStrategy strategy = MsgStrategyFactory.getStrategy(msgVO.getType(), msgVO.getSubType());
-                                // 根据对应的策略进行处理
-                                if (strategy != null) {
-                                    strategy.process(msgVO);
-                                }
-                            }).collect(Collectors.toList());
-                })
-                // 设置默认值
-                .orElse(Collections.emptyList());
+    public List<MsgVO> queryMsg(String talker, Long nextSequence) {
+        List<Msg> allData = msgRepository.queryMsgByTalker(talker, nextSequence);
+        // 获取用户信息
+        WeChatVO user = UserUtil.getUser();
+        // 根据时间排序
+        return msgMapping.convert(allData).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
+                // 遍历数据
+                .peek(msgVO -> {
+                    msgVO.setWxId(getChatWxId(talker, msgVO, user));
+                    // 设置处理日期
+                    msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
+                    // 设置聊天头像
+                    msgVO.setAvatar(getChatAvatar(msgVO.getWxId()));
+                    // 读取消息类型策略
+                    MsgStrategy strategy = MsgStrategyFactory.getStrategy(msgVO.getType(), msgVO.getSubType());
+                    // 根据对应的策略进行处理
+                    if (strategy != null) {
+                        strategy.process(msgVO);
+                    }
+                }).collect(Collectors.toList());
     }
 
     @Override
     public String exportMsg(String talker) {
-        // 根据Id查询聊天记录
-        List<MsgVO> msgVOList = Optional.ofNullable(msgRepository.exportMsg(talker))
-                // 处理消息
-                .map(msgs -> {
-                    // 获取用户信息
-                    WeChatVO user = UserUtil.getUser();
-                    // 根据时间排序
-                    return msgMapping.convert(msgs).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
-                            // 遍历数据
-                            .peek(msgVO -> {
-                                msgVO.setWxId(getChatWxId(talker, msgVO, user));
-                                // 设置处理日期
-                                msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
-                                // 读取消息类型策略
-                                MsgStrategy strategy = MsgStrategyFactory.getStrategy(msgVO.getType(), msgVO.getSubType());
-                                // 根据对应的策略进行处理
-                                if (strategy != null) {
-                                    strategy.process(msgVO);
-                                }
-                            }).collect(Collectors.toList());
-                })
-                // 设置默认值
-                .orElse(Collections.emptyList());
-
+        List<Msg> msgList = msgRepository.exportMsg(talker);
+        // 获取用户信息
+        WeChatVO user = UserUtil.getUser();
+        // 根据时间排序
+        List<MsgVO> msgVOList = msgMapping.convert(msgList).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
+                // 遍历数据
+                .peek(msgVO -> {
+                    msgVO.setWxId(getChatWxId(talker, msgVO, user));
+                    // 设置处理日期
+                    msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
+                    // 读取消息类型策略
+                    MsgStrategy strategy = MsgStrategyFactory.getStrategy(msgVO.getType(), msgVO.getSubType());
+                    // 根据对应的策略进行处理
+                    if (strategy != null) {
+                        strategy.process(msgVO);
+                    }
+                }).collect(Collectors.toList());
         // 聊天人的昵称
         String nickname = contactRepository.getContactNickname(talker);
         // 分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
-        String filePath = System.getProperty("user.dir") + separator + "export";
+        String filePath = System.getProperty("user.dir") + separator + "data" + separator + "export";
         // 创建文件
         FileUtil.mkdir(filePath);
         // 文件路径+文件名
         String pathName = filePath + separator + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss") + nickname + ".xlsx";
         // 导出
-        EasyExcel.write(pathName, ExportMsgVO.class)
-                .sheet("sheet1")
-                .doWrite(() -> msgMapping.convertToExportMsgVO(msgVOList));
+        EasyExcel.write(pathName, ExportMsgVO.class).sheet("sheet1").doWrite(() -> msgMapping.convertToExportMsgVO(msgVOList));
         // 返回写入后的文件
         return pathName;
     }

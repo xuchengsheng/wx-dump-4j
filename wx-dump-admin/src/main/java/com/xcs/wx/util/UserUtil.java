@@ -4,6 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
 import com.xcs.wx.domain.vo.WeChatVO;
 
+import java.nio.file.FileSystems;
+
 /**
  * @author xcs
  * @date 2024年01月16日 13时52分
@@ -36,8 +38,8 @@ public class UserUtil {
         // 获得工作目录
         String userDir = System.getProperty("user.dir");
         // 文件分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 存储目录
-        return userDir + separator + "config" + separator + "user.json";
+        return userDir + separator + "data" + separator + "config" + separator + "user.json";
     }
 }

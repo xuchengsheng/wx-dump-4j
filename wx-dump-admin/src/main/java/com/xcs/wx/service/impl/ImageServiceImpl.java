@@ -13,6 +13,8 @@ import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.FileSystems;
+
 /**
  * 图片服务
  *
@@ -30,7 +32,7 @@ public class ImageServiceImpl implements ImageService {
         // 获得工作目录
         String userDir = System.getProperty("user.dir");
         // 文件分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 查询数据库
         String imgUrl = hardLinkImageAttributeRepository.queryHardLinkImage(HexUtil.decodeHex(md5));
         // 查询结果为空，返回404
@@ -45,7 +47,7 @@ public class ImageServiceImpl implements ImageService {
         if (!FileUtil.exist(filePath)) {
             return userDir + separator + "asset" + separator + "404.png";
         }
-        String outPath = userDir + separator + "img";
+        String outPath = userDir + separator + "data" + separator + "img";
         // 解密并返回
         return ImgDecoderUtil.decodeDat(filePath, outPath);
     }
@@ -55,9 +57,9 @@ public class ImageServiceImpl implements ImageService {
         // 获得工作目录
         String userDir = System.getProperty("user.dir");
         // 文件分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 返回默认图片
-        String destPath = userDir + separator + "img" + separator + IdUtil.fastSimpleUUID() + ".gif";
+        String destPath = userDir + separator + "data" + separator + "img" + separator + IdUtil.fastSimpleUUID() + ".gif";
         // 下载图片
         try {
             HttpUtil.downloadFile(path, destPath);
@@ -74,7 +76,7 @@ public class ImageServiceImpl implements ImageService {
         // 获得工作目录
         String userDir = System.getProperty("user.dir");
         // 文件分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 获取用户信息
         WeChatVO user = UserUtil.getUser();
         // 获得文件目录
@@ -83,7 +85,10 @@ public class ImageServiceImpl implements ImageService {
         if (!FileUtil.exist(filePath)) {
             return userDir + separator + "asset" + separator + "404.png";
         }
-        String outPath = userDir + separator + "img";
+        String outPath = userDir + separator + "data" + separator + "img";
+        if (!FileUtil.exist(outPath)) {
+            FileUtil.mkdir(outPath);
+        }
         // 解密并返回
         return ImgDecoderUtil.decodeDat(filePath, outPath);
     }

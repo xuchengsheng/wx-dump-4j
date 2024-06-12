@@ -3,6 +3,7 @@ package com.xcs.wx;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -14,7 +15,6 @@ import java.util.Date;
  * @author xcs
  * @date 2023年12月21日 17时02分
  **/
-@EnableScheduling
 @SpringBootApplication
 @EnableTransactionManagement
 public class WxDumpApplication {

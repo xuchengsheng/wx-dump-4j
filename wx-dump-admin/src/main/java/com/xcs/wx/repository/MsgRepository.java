@@ -16,39 +16,13 @@ import java.util.List;
 public interface MsgRepository {
 
     /**
-     * 获得最大的序列号
+     * 根据talker与分页信息查询聊天记录
      *
-     * @param poolName 连接池名称
-     * @return 最大序列号
-     */
-    Long getNextSequence(String poolName);
-
-    /**
-     * 查询
-     *
-     * @param poolName     连接池名称
+     * @param talker       对话着
      * @param nextSequence 下一个序列号
-     * @return Page
-     */
-    List<Msg> queryMsgBySequence(String poolName, Long nextSequence);
-
-    /**
-     * 批量插入数据
-     *
-     * @param poolName 数据源连接池名称
-     * @param msg      需要保存的数据
-     * @return 是否新增成功
-     */
-    boolean saveBatch(String poolName, List<Msg> msg);
-
-    /**
-     * 根据talker查询聊天记录
-     *
-     * @param talker     对话着
-     * @param createTime 创建时间
      * @return Msg
      */
-    List<Msg> queryMsgByTalker(String talker, Long createTime);
+    List<Msg> queryMsgByTalker(String talker, Long nextSequence);
 
     /**
      * 导出数据

@@ -1,5 +1,7 @@
 package com.xcs.wx.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +13,7 @@ import java.nio.file.Paths;
  * @author xcs
  * @date 2023年12月28日 15时44分
  **/
+@Slf4j
 public class ImgDecoderUtil {
 
     /**
@@ -85,7 +88,7 @@ public class ImgDecoderUtil {
             }
             return fileOutPath;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("decode dat failed", e);
         }
         return null;
     }
@@ -128,14 +131,10 @@ public class ImgDecoderUtil {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("decode dat getCode failed", e);
         }
 
         // 如果没有匹配的文件类型，返回错误代码
         return new int[]{-1, -1};
-    }
-
-    public static void main(String[] args) {
-        decodeDat("D:\\WeChat Files\\WeChat Files\\wxid_esfvm4299gsy22\\FileStorage\\MsgAttach\\38f147c34e7f97ff0788ed689e54587a\\Thumb\\2024-04\\43e489a118b3908440e4ec14964047c5_t.dat","D:\\");
     }
 }

@@ -1,9 +1,6 @@
 package com.xcs.wx.repository.impl;
 
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
-import com.baomidou.mybatisplus.core.batch.MybatisBatch;
-import com.baomidou.mybatisplus.core.toolkit.MybatisBatchUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xcs.wx.constant.DataSourceType;
@@ -15,11 +12,10 @@ import com.xcs.wx.mapper.MsgMapper;
 import com.xcs.wx.repository.MsgRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 消息 Repository 实现类
@@ -30,95 +26,128 @@ import java.util.List;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@DS(value = DataSourceType.MSG_DB)
 public class MsgRepositoryImpl extends ServiceImpl<MsgMapper, Msg> implements MsgRepository {
 
-    private final TransactionTemplate transactionTemplate;
-    private final SqlSessionFactory sqlSessionFactory;
-
     @Override
-    public Long getNextSequence(String poolName) {
-        // 切换数据源
-        DynamicDataSourceContextHolder.push(poolName);
-        // 获得最大的序列号
-        Long nextSequence = getBaseMapper().getNextSequence();
-        // 清理动态数据源
-        DynamicDataSourceContextHolder.clear();
-        // 返回数据
-        return nextSequence;
-    }
-
-    @Override
-    public List<Msg> queryMsgBySequence(String poolName, Long nextSequence) {
-        log.info("Start querying data:[{}][{}]", poolName, nextSequence);
-        // 切换数据源
-        DynamicDataSourceContextHolder.push(poolName);
-        // 根据数量与序列号获取消息
-        List<Msg> msgs = getBaseMapper().queryMsgBySequence(nextSequence);
-        // 清理动态数据源
-        DynamicDataSourceContextHolder.clear();
-        log.info("End querying data:[{}][{}]", poolName, nextSequence);
-        // 返回数据
-        return msgs;
-    }
-
-    @Override
-    public boolean saveBatch(String poolName, List<Msg> msg) {
-        log.info("Start adding new data:[{}][{}]", poolName, msg.size());
-        // 切换数据源
-        DynamicDataSourceContextHolder.push(poolName);
-        // 批量执行
-        transactionTemplate.execute(status -> {
-            MybatisBatch.Method<Msg> mapperMethod = new MybatisBatch.Method<>(MsgMapper.class);
-            return MybatisBatchUtils.execute(sqlSessionFactory, msg, mapperMethod.insert());
-        });
-        // 清理动态数据源
-        DynamicDataSourceContextHolder.clear();
-        log.info("End adding new data:[{}][{}]", poolName, msg.size());
-        // 返回数据
-        return true;
-    }
-
-    @Override
-    public List<Msg> queryMsgByTalker(String talker, Long lastCreateTime) {
-        return super.list(Wrappers.<Msg>lambdaQuery()
-                .eq(Msg::getStrTalker, talker)
-                .lt(Msg::getCreateTime, lastCreateTime)
-                .ne(Msg::getType, 11000)
-                .orderByDesc(Msg::getCreateTime)
-                .last("limit 20"));
+    public List<Msg> queryMsgByTalker(String talker, Long nextSequence) {
+        List<Msg> msgList = new ArrayList<>();
+        List<String> msgDbList = DataSourceType.getMsgDb().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        int offset = 20;
+        for (String poolName : msgDbList) {
+            if (offset <= 0) break;
+            DynamicDataSourceContextHolder.push(poolName);
+            List<Msg> queryResultList = super.list(Wrappers.<Msg>lambdaQuery()
+                    .eq(Msg::getStrTalker, talker).orderByDesc(Msg::getSequence)
+                    .lt((nextSequence != null && nextSequence > 0), Msg::getSequence, nextSequence)
+                    .last("limit " + offset));
+            DynamicDataSourceContextHolder.clear();
+            offset -= queryResultList.size();
+            msgList.addAll(queryResultList);
+        }
+        return msgList;
     }
 
     @Override
     public List<Msg> exportMsg(String talker) {
-        return super.list(Wrappers.<Msg>lambdaQuery()
-                .eq(Msg::getStrTalker, talker)
-                .ne(Msg::getType, 11000)
-                .orderByDesc(Msg::getCreateTime));
+        List<Msg> msgList = new ArrayList<>();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            List<Msg> queryResultList = super.list(Wrappers.<Msg>lambdaQuery()
+                    .eq(Msg::getStrTalker, talker)
+                    .orderByDesc(Msg::getSequence));
+            DynamicDataSourceContextHolder.clear();
+            msgList.addAll(queryResultList);
+        }
+        return msgList;
     }
 
     @Override
     public List<MsgTypeDistributionVO> msgTypeDistribution() {
-        return super.getBaseMapper().msgTypeDistribution();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        Map<String, MsgTypeDistributionVO> countRecentMsgsMap = new HashMap<>();
+
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            List<MsgTypeDistributionVO> currentMsgsList = super.getBaseMapper().msgTypeDistribution();
+            DynamicDataSourceContextHolder.clear();
+
+            currentMsgsList.forEach(msg -> {
+                countRecentMsgsMap.merge(msg.getType(), msg, (existing, newMsg) -> {
+                    existing.setValue(existing.getValue() + newMsg.getValue());
+                    return existing;
+                });
+            });
+        }
+        return new ArrayList<>(countRecentMsgsMap.values());
     }
 
     @Override
     public List<CountRecentMsgsVO> countRecentMsgs() {
-        return super.getBaseMapper().countRecentMsgs();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        Map<String, CountRecentMsgsVO> countRecentMsgsMap = new HashMap<>();
+
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            List<CountRecentMsgsVO> currentMsgsList = super.getBaseMapper().countRecentMsgs();
+            DynamicDataSourceContextHolder.clear();
+
+            currentMsgsList.forEach(msg -> {
+                String key = msg.getType() + "-" + msg.getCategory();
+                countRecentMsgsMap.merge(key, msg, (existing, newMsg) -> {
+                    existing.setValue(existing.getValue() + newMsg.getValue());
+                    return existing;
+                });
+            });
+        }
+        return countRecentMsgsMap.values().stream()
+                .sorted(Comparator.comparing(CountRecentMsgsVO::getType).reversed())
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<TopContactsVO> topContacts() {
-        return super.getBaseMapper().topContacts();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        Map<String, TopContactsVO> topContactsMap = new HashMap<>();
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            List<TopContactsVO> currentContactsList = super.getBaseMapper().topContacts();
+            DynamicDataSourceContextHolder.clear();
+
+            currentContactsList.forEach(contact ->
+                    topContactsMap.merge(contact.getUserName(), contact, (existing, newContact) -> {
+                        existing.setTotal(existing.getTotal() + newContact.getTotal());
+                        return existing;
+                    })
+            );
+        }
+        return topContactsMap.values().stream()
+                .sorted(Comparator.comparing(TopContactsVO::getTotal).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 
     @Override
     public int countSent() {
-        return getBaseMapper().countSent();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        int count = 0;
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            count += getBaseMapper().countSent();
+            DynamicDataSourceContextHolder.clear();
+        }
+        return count;
     }
 
     @Override
     public int countReceived() {
-        return getBaseMapper().countReceived();
+        List<String> msgDbList = DataSourceType.getMsgDb();
+        int count = 0;
+        for (String poolName : msgDbList) {
+            DynamicDataSourceContextHolder.push(poolName);
+            count += getBaseMapper().countReceived();
+            DynamicDataSourceContextHolder.clear();
+        }
+        return count;
     }
 }

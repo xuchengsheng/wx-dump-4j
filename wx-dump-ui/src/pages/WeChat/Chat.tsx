@@ -12,7 +12,7 @@ const { Text } = Typography;
 const Chat: React.FC<ChatProps> = ({ userName }) => {
   const [initLoading, setInitLoading] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
-  const [lastCreateTime, setCreateTime] = useState<number>(9999999999);
+  const [nextSequence, setNextSequence] = useState<number>(0);
   const [chatList, setChatList] = useState<MsgItem[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [prevScrollHeight, setPrevScrollHeight] = useState(0);
@@ -27,14 +27,14 @@ const Chat: React.FC<ChatProps> = ({ userName }) => {
     return false;
   };
 
-  const getMsg = async (lastCreateTime: number) => {
+  const getMsg = async (nextSequence: number) => {
     if (userName) {
       setInitLoading(true);
-      const response = await queryMsg({ talker: userName, lastCreateTime: lastCreateTime });
+      const response = await queryMsg({ talker: userName, nextSequence: nextSequence });
       if (response.data && response.data.length > 0) {
         setPrevScrollHeight(chatContainerRef.current ? chatContainerRef.current.scrollHeight : 0);
         setChatList((prevChatList) => [...(response.data || []), ...prevChatList]);
-        setCreateTime(response.data[0].createTime);
+        setNextSequence(response.data[0].sequence);
       } else {
         setAllLoaded(true);
       }
@@ -43,17 +43,14 @@ const Chat: React.FC<ChatProps> = ({ userName }) => {
   };
 
   useEffect(() => {
-    const newCreateTime = 9999999999;
-    setCreateTime(newCreateTime);
     setAllLoaded(false);
     setChatList([]);
-    getMsg(newCreateTime);
+    getMsg(0);
   }, [userName]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      const newScrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight;
-      chatContainerRef.current.scrollTop = newScrollTop;
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight;
       setPrevScrollHeight(chatContainerRef.current.scrollHeight);
     }
   }, [chatList]);
@@ -62,7 +59,7 @@ const Chat: React.FC<ChatProps> = ({ userName }) => {
     <div className="chat-scrollbar" ref={chatContainerRef}>
       {userName && !allLoaded && (
         <div className="more-msg">
-          <Button disabled={initLoading} type="link" onClick={() => getMsg(lastCreateTime)}>
+          <Button disabled={initLoading} type="link" onClick={() => getMsg(nextSequence)}>
             查看更多消息
           </Button>
         </div>

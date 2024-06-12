@@ -137,13 +137,12 @@
         FROM
             MSG
         WHERE
-            StrTalker NOT LIKE '%@chatroom'
+            StrTalker NOT LIKE '%@chatroom' and StrTalker not in ('newsapp','notifymessage','filehelper','fmessage')
           AND DATE( CreateTime, 'unixepoch', 'localtime' ) >= DATE( 'now', '-1 month', 'localtime' )
         GROUP BY
             userName
         ORDER BY
             total DESC
-            LIMIT 10;
     </select>
 
     <!-- 统计发送消息数量 -->

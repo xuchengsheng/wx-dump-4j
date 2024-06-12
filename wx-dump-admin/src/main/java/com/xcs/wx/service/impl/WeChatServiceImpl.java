@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -77,7 +78,7 @@ public class WeChatServiceImpl implements WeChatService {
         WeChatOffsetProperties.VersionConfig versionConfig = getVersionConfig(version);
         // 未读取到偏移量
         if (versionConfig == null) {
-            throw new BizException(-1, "不支持当前微信版本号" + version + "，请升级到微信最新版本。");
+            throw new BizException(-1, "未读取到偏移量配置,请从Github获取最新代码,当前微信版本号:" + version);
         }
         // 获取微信昵称
         String nickname = getInfo(pid, (baseAddress + versionConfig.getNickname()));
@@ -90,7 +91,7 @@ public class WeChatServiceImpl implements WeChatService {
         // 获取微信Id
         String wxId = getWxId(pid);
         // 获取微信秘钥
-        String key = getKey(pid, basePath + System.getProperty("file.separator") + wxId);
+        String key = getKey(pid, basePath + FileSystems.getDefault().getSeparator() + wxId);
         // 获取微信秘钥失败
         if (StrUtil.isBlank(key)) {
             throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
@@ -267,9 +268,9 @@ public class WeChatServiceImpl implements WeChatService {
         WinNT.HANDLE process = Kernel32.INSTANCE.OpenProcess(0x1F0FFF, false, pid);
 
         // 定义不同平台对应的字节数组
-        byte[] iphoneByteArray = {105, 112, 104, 111, 110, 101, 0};
-        byte[] androidByteArray = {97, 110, 100, 114, 111, 105, 100, 0};
-        byte[] ipadByteArray = {105, 112, 97, 100, 0};
+        byte[] iphoneByteArray = "iphone\0".getBytes();
+        byte[] androidByteArray = "android\0".getBytes();
+        byte[] ipadByteArray = "ipad\0".getBytes();
 
         // 用于存储不同平台的模块扫描结果
         List<Pointer> typeAddress = new ArrayList<>();
@@ -308,7 +309,6 @@ public class WeChatServiceImpl implements WeChatService {
                 }
             }
         }
-
         // 未找到匹配的密钥，返回null
         return null;
     }
@@ -389,7 +389,7 @@ public class WeChatServiceImpl implements WeChatService {
             // 秘钥匹配成功
             return Pbkdf2HmacUtil.checkKey(key, macSalt, firstPageHashMac, firstPageBodyAndIv);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Verification key failed", e);
         }
         return false;
     }
@@ -551,7 +551,7 @@ public class WeChatServiceImpl implements WeChatService {
                 return txt + "\\WeChat Files";
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to obtain WeChat directory", e);
         }
         // 如果无法获取路径，则返回 null
         return null;
