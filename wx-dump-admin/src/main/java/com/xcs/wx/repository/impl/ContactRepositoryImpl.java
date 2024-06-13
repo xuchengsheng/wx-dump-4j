@@ -39,7 +39,7 @@ public class ContactRepositoryImpl extends ServiceImpl<ContactMapper, Contact> i
 
     @Override
     public List<AllContactVO> queryAllContact() {
-        return getBaseMapper().queryAllContact();
+        return getBaseMapper().queryAllContact().stream().filter(contactVO -> !contactVO.getNickName().isEmpty()).collect(Collectors.toList());
     }
 
     @Override

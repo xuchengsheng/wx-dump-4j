@@ -3,7 +3,7 @@
 
 <mapper namespace="com.xcs.wx.mapper.HardLinkImageAttributeMapper">
 
-    <!-- 查询群聊 -->
+    <!-- 查询图片地址 -->
     <select id="queryHardLinkImage" resultType="java.lang.String">
         SELECT
            '\\FileStorage\MsgAttach\\' || hli1.Dir || '\\' || 'Image' || '\\' || hli2.Dir || '\\' || hlia.FileName

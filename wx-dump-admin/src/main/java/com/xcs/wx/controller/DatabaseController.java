@@ -1,5 +1,6 @@
 package com.xcs.wx.controller;
 
+import cn.hutool.system.SystemUtil;
 import com.xcs.wx.domain.dto.DecryptDTO;
 import com.xcs.wx.domain.vo.ResponseVO;
 import com.xcs.wx.domain.vo.WeChatVO;
@@ -31,6 +32,10 @@ public class DatabaseController {
      */
     @GetMapping("/decrypt")
     public ResponseVO<Boolean> decrypt(DecryptDTO decryptDTO) {
+        // 读取JDK版本号
+        if (SystemUtil.getJavaInfo().getVersionInt() < 1100) {
+            return ResponseVO.error(-1, "微信解密必须要求JDK11以上版本,请更换JDK以上版本。");
+        }
         databaseService.decrypt(decryptDTO);
         // 返回数据
         return ResponseVO.ok(true);

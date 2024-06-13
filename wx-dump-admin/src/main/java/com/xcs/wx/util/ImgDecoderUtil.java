@@ -66,7 +66,7 @@ public class ImgDecoderUtil {
             // 获取文件名（不包含扩展名）
             String fileName = file.getName();
             // 文件名+后缀
-            String picName = fileName.substring(0, fileName.length() - 4) + extension;
+            String picName = fileName.replace(".dat", "") + extension;
 
             // 构造输出文件的完整路径
             String fileOutPath = Paths.get(outPath, picName).toString();
@@ -136,5 +136,9 @@ public class ImgDecoderUtil {
 
         // 如果没有匹配的文件类型，返回错误代码
         return new int[]{-1, -1};
+    }
+
+    public static void main(String[] args) {
+        decodeDat("D:\\xuchengsheng\\output_file1", "D:\\");
     }
 }
