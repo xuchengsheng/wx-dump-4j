@@ -39,7 +39,7 @@
 ## ⚡技术
 
 <div align="left">
-    <img src="https://img.shields.io/badge/Java-8%2B-%23437291?logo=openjdk&logoColor=%23437291"/>
+    <img src="https://img.shields.io/badge/Java-11%2B-%23437291?logo=openjdk&logoColor=%23437291"/>
     <img src="https://img.shields.io/badge/Spring-5.3.10-%23437291?logo=Spring&logoColor=%236DB33F&color=%236DB33F"/>
     <img src="https://img.shields.io/badge/SpringBoot-2.5.5-%23437291?logo=SpringBoot&logoColor=%236DB33F&color=%236DB33F"/>
     <img src="https://img.shields.io/badge/JNA-5.8.0-%23437291?logo=JNA&logoColor=%23228B22&color=%23228B22"/>
@@ -54,10 +54,11 @@
 
 </div>
 
+## 🎉项目介绍
 
-## 👋功能
+**wx-dump-4j** 是一款强大的Java版微信聊天记录备份与管理工具，专为微信用户提供全面的数据整合与分析解决方案。通过wx-dump-4j，用户可以获取当前登录微信的详细信息，如昵称、账号、手机号等，并支持多种消息类型的管理，包括文本、图片、表情和系统消息。该工具能够导出各类微信记录，便于备份和分享，并且支持微信群聊的全面管理，包括群头像、群号、群聊名称、创建人、群聊人数、备注、群聊类型及解散状态。wx-dump-4j 突破了微信历史朋友圈的三日查看限制，提供丰富的统计与分析功能，如好友数、群聊数、每日消息数量统计、互动频率分析和关键词词云图展示。用户只需简单的安装和启动，即可轻松实现微信数据的深度挖掘与管理。[点击此处查看功能展示](docs/display.md)
 
-[点击此处查看功能展示](docs/display.md)
+## 👋主要功能
 
 + 获取当前登录微信的微信昵称、账号、手机号、邮箱、秘钥、微信Id、文件夹路径
 + 将微信PC的多个聊天记录数据库合并为单一数据库文件
@@ -71,9 +72,13 @@
 + 展示微信消息类别占比图表
 + 展示微信最近使用的关键字词云图
 
+## ✨顺手点个星
+
+我花费了大量时间和精力开发这款工具，只为让大家在微信记录管理上更加轻松。如果你觉得这个项目对你有帮助，请到GitHub给我们一个Star⭐️。你的支持是对我最大的鼓励，每一颗星星都意味着我的努力得到了认可。
+
 ### 🚀快速启动
 
-**安装包方式部署**
+#### 安装包方式部署
 
 - 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.0.0/wx-dump-4j-bin.tar.gz)
 
@@ -83,7 +88,7 @@
 
 - 启动成功后访问：[http://localhost:8080](http://localhost:8080)
 
-**源码方式部署**
+#### 源码方式部署
 
 + 下载源码`git clone https://github.com/xuchengsheng/wx-dump-4j.git`
 
@@ -135,7 +140,9 @@
 
 ## 👥扫码关注微信公众号
 
-关注后，回复关键字 “加群”，即可加入我们的技术交流群，与更多开发者一起交流学习。
+关注后，回复关键字 <font color="red">“加群”</font>，即可加入我们的技术交流群，与更多开发者一起交流学习。
+
+在此，我们真诚地邀请您访问我们的GitHub项目页面，如果您觉得wx-dump-4j对您有帮助，请顺手点个Star⭐️！每一颗星星都是我们前进的动力，是对我们努力的最大肯定。非常感谢您的支持！
 
 <div>
 <img alt="logo" src="image/wechat-mp.png">
