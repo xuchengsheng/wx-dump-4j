@@ -34,7 +34,7 @@ public class DatabaseController {
     public ResponseVO<Boolean> decrypt(DecryptDTO decryptDTO) {
         // 读取JDK版本号
         if (SystemUtil.getJavaInfo().getVersionInt() < 1100) {
-            return ResponseVO.error(-1, "微信解密必须要求JDK11以上版本,请更换JDK以上版本。");
+            return ResponseVO.error(-1, "微信解密必须要求JDK11以上版本,请更换JDK版本。");
         }
         databaseService.decrypt(decryptDTO);
         // 返回数据
