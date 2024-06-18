@@ -1,5 +1,6 @@
 package com.xcs.wx.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.HexUtil;
 import com.xcs.wx.domain.bo.DecryptBO;
 import com.xcs.wx.service.DecryptService;
@@ -138,7 +139,7 @@ public class DecryptServiceImpl implements DecryptService {
         }
         long end = System.currentTimeMillis();
 
-        log.info("结束解密：" + decryptBO.getInput() + "耗时：" + (end - start) + "ms");
+        log.info(FileUtil.getName("解密" + decryptBO.getInput()) + "耗时：" + (end - start) + "ms");
     }
 
     /**

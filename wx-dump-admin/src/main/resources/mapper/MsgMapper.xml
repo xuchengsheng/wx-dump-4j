@@ -31,45 +31,6 @@
         <result property="compressContent" column="compressContent" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
     </resultMap>
 
-    <!-- 获得最大的序列号 -->
-    <select id="getNextSequence" resultType="java.lang.Long">
-        SELECT MAX(Sequence) FROM MSG
-    </select>
-
-    <!-- 根据数量与序列号获取消息 -->
-    <select id="queryMsgBySequence" resultMap="msgResultMap">
-        SELECT
-            TalkerId AS talkerId,
-            MsgSvrID AS msgSvrId,
-            Type AS type,
-            SubType AS subType,
-            IsSender AS isSender,
-            CreateTime AS createTime,
-            Sequence AS sequence,
-            StatusEx AS statusEx,
-            FlagEx AS flagEx,
-            Status AS status,
-            MsgServerSeq AS msgServerSeq,
-            MsgSequence AS msgSequence,
-            StrTalker AS strTalker,
-            StrContent AS strContent,
-            DisplayContent AS displayContent,
-            Reserved0 AS reserved0,
-            Reserved1 AS reserved1,
-            Reserved2 AS reserved2,
-            Reserved3 AS reserved3,
-            Reserved4 AS reserved4,
-            Reserved5 AS reserved5,
-            Reserved6 AS reserved6,
-            BytesExtra AS bytesExtra,
-            BytesTrans AS bytesTrans,
-            CompressContent AS compressContent
-        FROM
-            MSG
-        WHERE
-            sequence > #{nextSequence}
-    </select>
-
     <!-- 微信消息类型及其分布统计 -->
     <select id="msgTypeDistribution" resultType="com.xcs.wx.domain.vo.MsgTypeDistributionVO">
         SELECT

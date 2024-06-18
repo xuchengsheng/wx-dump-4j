@@ -14,7 +14,7 @@ const Settings: ProLayoutProps & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '微信分析系统',
+  title: '微信管理系统',
   pwa: true,
   logo: '/logo.svg',
   iconfontUrl: '',

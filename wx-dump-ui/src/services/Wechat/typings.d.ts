@@ -223,3 +223,10 @@ interface StatsPanel {
 interface RecentUsedKeyWordItem {
   text: string;
 }
+
+type RecoverContactParams = {
+  current?: number;
+  pageSize?: number;
+  nickname?: string;
+  remark?: string;
+};

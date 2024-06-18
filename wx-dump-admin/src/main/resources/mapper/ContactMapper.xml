@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!--suppress SqlResolve -->
 <mapper namespace="com.xcs.wx.mapper.ContactMapper">
 
     <!-- 查询联系人 -->
@@ -49,6 +48,27 @@
           AND UserName NOT IN ( 'floatbottle', 'fmessage', 'medianote','filehelper' )
           AND UserName NOT LIKE '%@chatroom'
         ORDER BY COALESCE(NULLIF(RemarkPYInitial, ''), PYInitial)
+    </select>
+
+    <!-- 查询联系人与公众号的Id -->
+    <select id="getContactWithMp" resultType="java.lang.String">
+        <![CDATA[
+            SELECT
+                CASE WHEN c.Alias IS NULL OR c.Alias = '' THEN c.UserName ELSE c.Alias END AS alias
+            FROM
+                Contact c
+            WHERE
+                Type % 2 = 1
+                AND VerifyFlag = 0
+            UNION ALL
+            SELECT
+                CASE WHEN c.Alias IS NULL OR c.Alias = '' THEN c.UserName ELSE c.Alias END AS alias
+            FROM
+                Contact c
+            WHERE
+                UserName LIKE 'gh_%'
+                AND Alias <> ''
+        ]]>
     </select>
 
     <!-- 统计联系人数量 -->

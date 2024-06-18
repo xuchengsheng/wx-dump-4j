@@ -95,7 +95,7 @@ public class MsgServiceImpl implements MsgService {
         // 创建文件
         FileUtil.mkdir(filePath);
         // 文件路径+文件名
-        String pathName = filePath + separator + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss") + nickname + ".xlsx";
+        String pathName = filePath + separator + nickname + ".xlsx";
         // 导出
         EasyExcel.write(pathName, ExportMsgVO.class).sheet("sheet1").doWrite(() -> msgMapping.convertToExportMsgVO(msgVOList));
         // 返回写入后的文件

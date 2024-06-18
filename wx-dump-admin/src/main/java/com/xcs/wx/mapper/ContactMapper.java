@@ -10,6 +10,7 @@ import com.xcs.wx.domain.vo.ExportContactVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 联系人 Mapper
@@ -34,6 +35,13 @@ public interface ContactMapper extends BaseMapper<Contact> {
      * @return AllContactVO
      */
     List<AllContactVO> queryAllContact();
+
+    /**
+     * 查询联系人与公众号的Id
+     *
+     * @return Contact
+     */
+    Set<String> getContactWithMp();
 
     /**
      * 统计联系人数量

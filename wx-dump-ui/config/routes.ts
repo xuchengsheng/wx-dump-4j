@@ -12,48 +12,40 @@
  */
 export default [
   {
-    path: '/dashboard',
-    name: '数据分析',
-    icon: 'dashboard',
-    routes: [
-      {
-        path: '/dashboard/wechat',
-        name: '微信仪表台',
-        icon: 'smile',
-        component: './Dashboard/WeChat',
-      },
-    ],
+    path: '/dashboard/wechat',
+    name: '仪表台',
+    icon: 'DashboardOutlined',
+    component: './Dashboard/WeChat',
   },
   {
-    path: '/wechat',
-    name: '微信管理',
-    icon: 'wechat',
-    routes: [
-      {
-        path: '/wechat/session',
-        name: '会话管理',
-        icon: 'smile',
-        component: './WeChat/Session',
-      },
-      {
-        path: '/wechat/contact',
-        name: '联系人管理',
-        icon: 'smile',
-        component: './WeChat/Contact',
-      },
-      {
-        path: '/wechat/chatroom',
-        name: '群聊管理',
-        icon: 'smile',
-        component: './WeChat/ChatRoom',
-      },
-      {
-        path: '/wechat/feeds',
-        name: '朋友圈管理',
-        icon: 'smile',
-        component: './WeChat/Feeds',
-      },
-    ],
+    path: '/wechat/session',
+    name: '会话管理',
+    icon: 'MessageOutlined',
+    component: './WeChat/Session',
+  },
+  {
+    path: '/wechat/contact',
+    name: '好友管理',
+    icon: 'UsergroupAddOutlined',
+    component: './WeChat/Contact',
+  },
+  {
+    path: '/wechat/chatroom',
+    name: '群聊管理',
+    icon: 'CommentOutlined',
+    component: './WeChat/ChatRoom',
+  },
+  {
+    path: '/wechat/feeds',
+    name: '朋友圈管理',
+    icon: 'ChromeOutlined',
+    component: './WeChat/Feeds',
+  },
+  {
+    path: '/wechat/recoverContact',
+    name: '找回好友',
+    icon: 'RotateRightOutlined',
+    component: './WeChat/RecoverContact',
   },
   {
     path: '/',

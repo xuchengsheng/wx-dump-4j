@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.excel.EasyExcel;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xcs.wx.domain.ChatRoomInfo;
@@ -18,8 +20,10 @@ import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.FileSystems;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +51,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public PageVO<ChatRoomVO> queryChatRoom(ChatRoomDTO chatRoomDTO) {
         // 查询群聊
         return Opt.ofNullable(chatRoomRepository.queryChatRoom(chatRoomDTO))
+                // 设置群聊人数
                 .map(page -> {
-                    // 设置群聊人数
                     for (ChatRoomVO chatRoom : page.getRecords()) {
                         chatRoom.setMemberCount(handleMembersCount(chatRoom.getRoomData()));
+                    }
+                    return page;
+                })
+                // 处理头像为空问题
+                .map(page -> {
+                    for (ChatRoomVO chatRoom : page.getRecords()) {
+                        // 如果有头像则不处理
+                        if (!StrUtil.isBlank(chatRoom.getHeadImgUrl())) {
+                            continue;
+                        }
+                        // 获取spring上下文
+                        ApplicationContext context = SpringUtil.getApplicationContext();
+                        // 获取端口
+                        String port = context.getEnvironment().getProperty("server.port", "8080");
+                        // 设置联系人头像路径
+                        chatRoom.setHeadImgUrl("http://localhost:" + port + "/api/contact/headImg/avatar?userName=" + chatRoom.getChatRoomName());
                     }
                     return page;
                 })
@@ -79,7 +99,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     public String exportChatRoom() {
         // 分隔符
-        String separator = System.getProperty("file.separator");
+        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
         String filePath = System.getProperty("user.dir") + separator + "export";
         // 创建文件
@@ -157,7 +177,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             // 群成员
             chatRoomDetailVo.setMembers(chatRoomMapping.convert(membersList, headImgUrlMap, contactNicknameMap));
         } catch (InvalidProtocolBufferException e) {
-            log.error("Failed to parse RoomData",  e);
+            log.error("Failed to parse RoomData", e);
         }
     }
 
@@ -173,7 +193,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         try {
             chatRoomProto = ChatRoomProto.ChatRoom.parseFrom(roomData);
         } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
+            log.error("parse roomData failed", e);
         }
         // 空校验
         if (chatRoomProto == null) {

@@ -11,6 +11,7 @@ import { Avatar, Button, Card, Divider, Flex, List, Modal, Space, Tag, Typograph
 import React, { useState } from 'react';
 import Chat from './Chat';
 import './Style/ChatRoom.less';
+import {exportMsg} from "@/services/Wechat/Msg";
 
 const ChatRoom: React.FC = () => {
   const [isChatRoomDetailOpen, setIsChatRoomDetailOpen] = useState(false);
@@ -21,7 +22,8 @@ const ChatRoom: React.FC = () => {
   const [chatRoomDetail, setChatRoomDetail] = useState<ChatRoomDetail>();
   const [userName, setUserName] = useState<string>();
   const [nickName, setNickName] = useState<string>();
-  
+  const [isExportChatOpen, setIsExportChatOpen] = useState(false);
+
   const { Text } = Typography;
 
   const handleChatDetail = (record: ChatRoomItem) => {
@@ -59,6 +61,29 @@ const ChatRoom: React.FC = () => {
     setIsExporting(false);
     setIsChatRoomExportOpen(false);
   };
+
+  const handleExportChat = async () => {
+    setIsExporting(true);
+    try {
+      const response = await exportMsg({ talker: userName });
+      if (response.success) {
+        const link = document.createElement('a');
+        link.href = '/api/export/download?path=' + encodeURIComponent(response.data);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsExporting(false);
+    setIsExportChatOpen(false);
+  };
+
+  const handleExportChatOpen = async (record: ChatRoomItem) =>{
+    setIsExportChatOpen(true);
+    setUserName(record.chatRoomName);
+  }
 
   const columns: ProColumns<ChatRoomItem>[] = [
     {
@@ -121,13 +146,11 @@ const ChatRoom: React.FC = () => {
       key: 'option',
       render: (text, record) => (
         <Flex justify="center">
-          <a key="detail" onClick={() => handleDetail(record)}>
-            查看详情
-          </a>
-          <Divider type="vertical" />
-          <a key="chat" onClick={() => handleChatDetail(record)}>
-            聊天记录
-          </a>
+          <a onClick={() => handleExportChatOpen(record)}>导出记录</a>
+          <Divider type="vertical"/>
+          <a key="detail" onClick={() => handleDetail(record)}>群聊详情</a>
+          <Divider type="vertical"/>
+          <a key="chat" onClick={() => handleChatDetail(record)}>聊天记录</a>
         </Flex>
       ),
     },
@@ -135,7 +158,7 @@ const ChatRoom: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<ChatRoomItem>
+    <ProTable<ChatRoomItem>
         columns={columns}
         cardBordered={{
           search: true,
@@ -244,6 +267,31 @@ const ChatRoom: React.FC = () => {
               loading={isExporting}
               disabled={isExporting}
               onClick={() => handleExportChatRoom()}
+            >
+              开始导出
+            </Button>
+          </Space>
+        </Flex>
+      </Modal>
+      <Modal
+        title="导出聊天记录"
+        open={isExportChatOpen}
+        footer={null}
+        onCancel={() => setIsExportChatOpen(false)}
+      >
+        <p style={{ padding: '15px' }}>
+          即将导出的微信聊天记录数据，请导出后妥善保管，以防信息泄露或丢失！
+        </p>
+        <Flex justify="flex-end">
+          <Space>
+            <Button disabled={isExporting} onClick={() => setIsExportChatOpen(false)}>
+              取消导出
+            </Button>
+            <Button
+              type="primary"
+              loading={isExporting}
+              disabled={isExporting}
+              onClick={() => handleExportChat()}
             >
               开始导出
             </Button>

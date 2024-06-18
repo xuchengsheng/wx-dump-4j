@@ -28,7 +28,7 @@ const DataBase: React.FC = () => {
     });
   };
 
-  const hanldelWeChat = async () => {
+  const handleWeChat = async () => {
     setIsDecryptOpen(true);
     setIsQueryWeChat(true);
     setWechat(null);
@@ -68,7 +68,7 @@ const DataBase: React.FC = () => {
   return (
     <>
       {contextHolder}
-      <Flex onClick={() => hanldelWeChat()}>
+      <Flex onClick={() => handleWeChat()}>
         <SyncOutlined spin/>
       </Flex>
       <Modal

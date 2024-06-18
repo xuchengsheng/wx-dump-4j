@@ -72,82 +72,65 @@ public class MsgRepositoryImpl extends ServiceImpl<MsgMapper, Msg> implements Ms
             List<MsgTypeDistributionVO> currentMsgsList = super.getBaseMapper().msgTypeDistribution();
             DynamicDataSourceContextHolder.clear();
 
-            currentMsgsList.forEach(msg -> {
-                countRecentMsgsMap.merge(msg.getType(), msg, (existing, newMsg) -> {
-                    existing.setValue(existing.getValue() + newMsg.getValue());
-                    return existing;
-                });
-            });
+            currentMsgsList.forEach(msg -> countRecentMsgsMap.merge(msg.getType(), msg, (existing, newMsg) -> {
+                existing.setValue(existing.getValue() + newMsg.getValue());
+                return existing;
+            }));
         }
         return new ArrayList<>(countRecentMsgsMap.values());
     }
 
     @Override
     public List<CountRecentMsgsVO> countRecentMsgs() {
-        List<String> msgDbList = DataSourceType.getMsgDb();
-        Map<String, CountRecentMsgsVO> countRecentMsgsMap = new HashMap<>();
-
-        for (String poolName : msgDbList) {
-            DynamicDataSourceContextHolder.push(poolName);
+        Optional<String> poolNameOptional = DataSourceType.getMsgDb().stream().max(Comparator.naturalOrder());
+        if (poolNameOptional.isPresent()) {
+            DynamicDataSourceContextHolder.push(poolNameOptional.get());
             List<CountRecentMsgsVO> currentMsgsList = super.getBaseMapper().countRecentMsgs();
             DynamicDataSourceContextHolder.clear();
-
-            currentMsgsList.forEach(msg -> {
-                String key = msg.getType() + "-" + msg.getCategory();
-                countRecentMsgsMap.merge(key, msg, (existing, newMsg) -> {
-                    existing.setValue(existing.getValue() + newMsg.getValue());
-                    return existing;
-                });
-            });
+            return currentMsgsList.stream()
+                    .sorted(Comparator.comparing(CountRecentMsgsVO::getType).reversed())
+                    .collect(Collectors.toList());
         }
-        return countRecentMsgsMap.values().stream()
-                .sorted(Comparator.comparing(CountRecentMsgsVO::getType).reversed())
-                .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     @Override
     public List<TopContactsVO> topContacts() {
-        List<String> msgDbList = DataSourceType.getMsgDb();
-        Map<String, TopContactsVO> topContactsMap = new HashMap<>();
-        for (String poolName : msgDbList) {
-            DynamicDataSourceContextHolder.push(poolName);
+        Optional<String> poolNameOptional = DataSourceType.getMsgDb().stream().max(Comparator.naturalOrder());
+        if (poolNameOptional.isPresent()) {
+            DynamicDataSourceContextHolder.push(poolNameOptional.get());
             List<TopContactsVO> currentContactsList = super.getBaseMapper().topContacts();
             DynamicDataSourceContextHolder.clear();
 
-            currentContactsList.forEach(contact ->
-                    topContactsMap.merge(contact.getUserName(), contact, (existing, newContact) -> {
-                        existing.setTotal(existing.getTotal() + newContact.getTotal());
-                        return existing;
-                    })
-            );
+            return currentContactsList.stream()
+                    .sorted(Comparator.comparing(TopContactsVO::getTotal).reversed())
+                    .limit(10)
+                    .collect(Collectors.toList());
         }
-        return topContactsMap.values().stream()
-                .sorted(Comparator.comparing(TopContactsVO::getTotal).reversed())
-                .limit(10)
-                .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     @Override
     public int countSent() {
-        List<String> msgDbList = DataSourceType.getMsgDb();
-        int count = 0;
-        for (String poolName : msgDbList) {
-            DynamicDataSourceContextHolder.push(poolName);
-            count += getBaseMapper().countSent();
+        Optional<String> poolNameOptional = DataSourceType.getMsgDb().stream().max(Comparator.naturalOrder());
+        if (poolNameOptional.isPresent()) {
+            DynamicDataSourceContextHolder.push(poolNameOptional.get());
+            int count = getBaseMapper().countSent();
             DynamicDataSourceContextHolder.clear();
+            return count;
         }
-        return count;
+        return 0;
     }
 
     @Override
     public int countReceived() {
-        List<String> msgDbList = DataSourceType.getMsgDb();
-        int count = 0;
-        for (String poolName : msgDbList) {
-            DynamicDataSourceContextHolder.push(poolName);
-            count += getBaseMapper().countReceived();
+        Optional<String> poolNameOptional = DataSourceType.getMsgDb().stream().max(Comparator.naturalOrder());
+        if (poolNameOptional.isPresent()) {
+            DynamicDataSourceContextHolder.push(poolNameOptional.get());
+            int count = getBaseMapper().countReceived();
             DynamicDataSourceContextHolder.clear();
+            return count;
         }
-        return count;
+        return 0;
     }
 }

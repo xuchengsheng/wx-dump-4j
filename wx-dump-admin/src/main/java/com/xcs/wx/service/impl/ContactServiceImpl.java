@@ -1,6 +1,5 @@
 package com.xcs.wx.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
@@ -77,7 +76,7 @@ public class ContactServiceImpl implements ContactService {
         // 创建文件
         FileUtil.mkdir(filePath);
         // 文件路径+文件名
-        String pathName = filePath + separator + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss") + "联系人" + ".xlsx";
+        String pathName = filePath + separator + "微信好友" + ".xlsx";
         // 导出
         EasyExcel.write(pathName, ExportContactVO.class)
                 .sheet("sheet1")

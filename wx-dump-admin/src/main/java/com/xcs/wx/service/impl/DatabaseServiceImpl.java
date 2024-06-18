@@ -5,6 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
+import com.baomidou.dynamic.datasource.creator.druid.DruidConfig;
 import com.xcs.wx.constant.SqliteConstant;
 import com.xcs.wx.domain.bo.DecryptBO;
 import com.xcs.wx.domain.dto.DecryptDTO;
@@ -50,22 +51,6 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
             stream.filter(file -> !Files.isDirectory(file))
                     // 过滤出文件名以.db结尾的文件
                     .filter(file -> file.toString().endsWith(".db"))
-                    // 过滤指定的数据库文件
-//                    .filter(file -> {
-//                        String filePath = file.toString();
-//                        // 聊天记录数据库
-//                        return filePath.matches(".*\\\\MSG\\d+\\.db") ||
-//                                // 联系人
-//                                filePath.endsWith("MicroMsg.db") ||
-//                                // 朋友圈
-//                                filePath.endsWith("Sns.db") ||
-//                                // 索引联系人
-//                                filePath.endsWith("FTSContact.db") ||
-//                                // 图片
-//                                filePath.endsWith("HardLinkImage.db") ||
-//                                // 视频
-//                                filePath.endsWith("HardLinkVideo.db");
-//                    })
                     // 将每个符合条件的文件路径映射为DecryptDTO对象
                     .map(item -> new DecryptBO(item.toString(), item.toString().replace(scanPath, replacementPath)))
                     // 批量解密
@@ -111,6 +96,16 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
      * @param dbPath 数据库路径
      */
     private void registerDataSource(String dbPath) {
+        DruidConfig druidConfig = new DruidConfig();
+        druidConfig.setInitialSize(5);
+        druidConfig.setMinIdle(5);
+        druidConfig.setMaxActive(20);
+        druidConfig.setMaxWait(60000);
+        druidConfig.setValidationQuery("SELECT 1");
+        druidConfig.setTestWhileIdle(true);
+        druidConfig.setTestOnBorrow(false);
+        druidConfig.setTestOnReturn(false);
+        druidConfig.setPoolPreparedStatements(true);
         DataSourceProperty sourceProperty = new DataSourceProperty();
         sourceProperty.setUrl(SqliteConstant.URL_PREFIX + dbPath);
         sourceProperty.setDriverClassName(SqliteConstant.DRIVER_CLASS_NAME);

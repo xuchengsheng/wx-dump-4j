@@ -70,16 +70,22 @@ public class WeChatServiceImpl implements WeChatService {
         if (pid == 0) {
             throw new BizException(-1, "检测到微信尚未启动，请先打开微信以继续进行操作。");
         }
-        // 获取微信的基址
-        long baseAddress = baseAddress(pid);
         // 获取版本号
         String version = getVersion(pid);
+        // 支持最小的版本号
+        String supportMinVersion = weChatOffsetConfig.getVersion().keySet().stream().findFirst().orElse("0.0.0.0");
+        // 校验版本号
+        if (compareVersions(supportMinVersion, version)) {
+            throw new BizException(-1, "当前微信版本不支持,请升级微信最新版本,当前微信版本号:" + version);
+        }
         // 读取微信版本对应的偏移量
         WeChatOffsetProperties.VersionConfig versionConfig = getVersionConfig(version);
         // 未读取到偏移量
         if (versionConfig == null) {
             throw new BizException(-1, "未读取到偏移量配置,请从Github获取最新代码,当前微信版本号:" + version);
         }
+        // 获取微信的基址
+        long baseAddress = baseAddress(pid);
         // 获取微信昵称
         String nickname = getInfo(pid, (baseAddress + versionConfig.getNickname()));
         // 获取微信账号
@@ -805,5 +811,18 @@ public class WeChatServiceImpl implements WeChatService {
         }
         // 如果无法获取路径，返回 null。
         return null;
+    }
+
+    /**
+     * 去掉点比较版本号的方法
+     *
+     * @param supportMinVersion 支持的版本
+     * @param currentVersion    当前版本
+     * @return true or false
+     */
+    private boolean compareVersions(String supportMinVersion, String currentVersion) {
+        long supportMinVersionLong = Long.parseLong(supportMinVersion.replaceAll("\\.", ""));
+        long currentVersionLong = Long.parseLong(currentVersion.replaceAll("\\.", ""));
+        return currentVersionLong < supportMinVersionLong;
     }
 }

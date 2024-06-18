@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xcs.wx.mapper.ContactHeadImgMapper">
+
+    <resultMap id="contactHeadImgMap" type="com.xcs.wx.domain.ContactHeadImg">
+        <result property="usrName" column="usrName" />
+        <result property="createTime" column="createTime" />
+        <result property="smallHeadBuf" column="smallHeadBuf" typeHandler="org.apache.ibatis.type.ByteArrayTypeHandler"/>
+        <result property="headImgMd5" column="m_headImgMD5" />
+    </resultMap>
+
+    <select id="getContactHeadImg" resultMap="contactHeadImgMap" parameterType="String">
+        SELECT * FROM ContactHeadImg1 where usrName = #{usrName}
+    </select>
+
+</mapper>

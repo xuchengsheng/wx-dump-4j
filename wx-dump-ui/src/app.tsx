@@ -1,11 +1,11 @@
 import DataBase from './pages/WeChat/DataBase';
+import UserAvatar from './pages/WeChat/UserAvatar';
+
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
-import { Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -23,10 +23,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
   return {
     actionsRender: () => [<DataBase key="db" />],
     avatarProps: {
-      title: <Avatar style={{ backgroundColor: '#87d068' }} size={28} icon={<UserOutlined />} />
+      title: <UserAvatar/>
     },
     onPageChange: () => {
-      
+
     },
     layoutBgImgList: [
       {

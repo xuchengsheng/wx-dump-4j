@@ -1,11 +1,12 @@
-import { exportContact, queryContact, queryContactLabel } from '@/services/Wechat/Contact';
-import { DownloadOutlined } from '@ant-design/icons';
-import type { ProColumns, RequestOptionsType } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Avatar, Button, Flex, Modal, Space, Tag } from 'antd';
-import React, { useState } from 'react';
+import {exportContact, queryContact, queryContactLabel} from '@/services/Wechat/Contact';
+import {DownloadOutlined} from '@ant-design/icons';
+import type {ProColumns, RequestOptionsType} from '@ant-design/pro-components';
+import {ProTable} from '@ant-design/pro-components';
+import {PageContainer} from '@ant-design/pro-layout';
+import {Avatar, Button, Divider, Flex, Modal, Space, Tag} from 'antd';
+import React, {useState} from 'react';
 import Chat from './Chat';
+import {exportMsg} from "@/services/Wechat/Msg";
 
 const Contact: React.FC = () => {
   const [isContactDetailOpen, setIsContactDetailOpen] = useState(false);
@@ -13,6 +14,7 @@ const Contact: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [userName, setUserName] = useState<string>();
   const [nickName, setNickName] = useState<string>();
+  const [isExportChatOpen, setIsExportChatOpen] = useState(false);
 
   const handleExportContact = async () => {
     setIsExporting(true);
@@ -32,6 +34,29 @@ const Contact: React.FC = () => {
     setIsExportContactOpen(false);
   };
 
+  const handleExportChat = async () => {
+    setIsExporting(true);
+    try {
+      const response = await exportMsg({ talker: userName });
+      if (response.success) {
+        const link = document.createElement('a');
+        link.href = '/api/export/download?path=' + encodeURIComponent(response.data);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsExporting(false);
+    setIsExportChatOpen(false);
+  };
+
+  const handleExportChatOpen = async (record: ContactItem) =>{
+    setIsExportChatOpen(true);
+    setUserName(record.userName);
+  }
+
   const handelContactDetail = (record: ContactItem) => {
     setUserName(record.userName);
     setNickName(record.remark ? record.remark : record.nickName);
@@ -45,7 +70,7 @@ const Contact: React.FC = () => {
       align: 'center',
       width: '120px',
       search: false,
-      render: (_, record) => <Avatar src={record.headImgUrl} shape="circle" size="large" />,
+      render: (_, record) => <Avatar src={record.headImgUrl} shape="circle" size="large"/>,
     },
     {
       dataIndex: 'userName',
@@ -84,9 +109,9 @@ const Contact: React.FC = () => {
           const response = await queryContactLabel();
           return response.data
             ? response.data.map((item) => ({
-                label: item.labelName,
-                value: item.labelId,
-              }))
+              label: item.labelName,
+              value: item.labelId,
+            }))
             : [];
         } catch (error) {
           console.error(error);
@@ -97,7 +122,7 @@ const Contact: React.FC = () => {
       render: (_, record) => (
         <>
           {record.labels.map((label) => (
-            <Tag style={{ marginBottom: '5px' }} color="#108ee9" key={label}>
+            <Tag style={{marginBottom: '5px'}} color="#108ee9" key={label}>
               {label}
             </Tag>
           ))}
@@ -108,8 +133,12 @@ const Contact: React.FC = () => {
       title: '操作',
       align: 'center',
       search: false,
-      width: '120px',
-      render: (_, record) => <a onClick={() => handelContactDetail(record)}>聊天记录</a>,
+      render: (_, record) =>
+        <Flex justify="center">
+          <a onClick={() => handleExportChatOpen(record)}>导出记录</a>
+          <Divider type="vertical"/>
+          <a onClick={() => handelContactDetail(record)}>聊天记录</a>
+        </Flex>
     },
   ];
 
@@ -144,7 +173,7 @@ const Contact: React.FC = () => {
           <Button
             onClick={() => setIsExportContactOpen(true)}
             key="button"
-            icon={<DownloadOutlined />}
+            icon={<DownloadOutlined/>}
             type="primary"
           >
             导出联系人
@@ -158,7 +187,7 @@ const Contact: React.FC = () => {
         open={isContactDetailOpen}
         onCancel={() => setIsContactDetailOpen(false)}
       >
-        <Chat userName={userName} />
+        <Chat userName={userName}/>
       </Modal>
       <Modal
         title="导出联系人"
@@ -166,7 +195,7 @@ const Contact: React.FC = () => {
         footer={null}
         onCancel={() => setIsExportContactOpen(false)}
       >
-        <p style={{ padding: '15px' }}>
+        <p style={{padding: '15px'}}>
           即将导出的微信联系人列表数据，请导出后妥善保管，以防信息泄露或丢失！
         </p>
         <Flex justify="flex-end">
@@ -179,6 +208,31 @@ const Contact: React.FC = () => {
               loading={isExporting}
               disabled={isExporting}
               onClick={() => handleExportContact()}
+            >
+              开始导出
+            </Button>
+          </Space>
+        </Flex>
+      </Modal>
+      <Modal
+        title="导出聊天记录"
+        open={isExportChatOpen}
+        footer={null}
+        onCancel={() => setIsExportChatOpen(false)}
+      >
+        <p style={{ padding: '15px' }}>
+          即将导出的微信聊天记录数据，请导出后妥善保管，以防信息泄露或丢失！
+        </p>
+        <Flex justify="flex-end">
+          <Space>
+            <Button disabled={isExporting} onClick={() => setIsExportChatOpen(false)}>
+              取消导出
+            </Button>
+            <Button
+              type="primary"
+              loading={isExporting}
+              disabled={isExporting}
+              onClick={() => handleExportChat()}
             >
               开始导出
             </Button>

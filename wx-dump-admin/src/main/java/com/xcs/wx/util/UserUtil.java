@@ -15,7 +15,7 @@ public class UserUtil {
     /**
      * 保存用户信息
      *
-     * @param weChatDTO
+     * @param weChatDTO 参数
      */
     public static void saveUser(WeChatVO weChatDTO) {
         FileUtil.writeString(JSONUtil.toJsonStr(weChatDTO), getUserPath(), "UTF-8");
@@ -25,7 +25,11 @@ public class UserUtil {
      * 保存用户信息
      */
     public static WeChatVO getUser() {
-        String json = FileUtil.readUtf8String(getUserPath());
+        String userPath = getUserPath();
+        if (!FileUtil.exist(userPath)) {
+            return null;
+        }
+        String json = FileUtil.readUtf8String(userPath);
         return JSONUtil.toBean(json, WeChatVO.class);
     }
 

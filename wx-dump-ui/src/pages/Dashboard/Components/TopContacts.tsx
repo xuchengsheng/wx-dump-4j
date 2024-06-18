@@ -33,7 +33,7 @@ const TopContacts: React.FC = () => {
               <span className={`${styles.topContactItemNumber} ${i < 3 ? styles.active : ''}`}>
                 {i + 1}
               </span>
-              <Avatar size="small" src={item.headImgUrl} />
+              <Avatar size={30} src={item.headImgUrl} />
               <span className={styles.topContactItemTitle} title={item.nickName}>
                 {item.nickName}
               </span>

@@ -33,13 +33,29 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public StatsPanelVO statsPanel() {
         // 联系人数量
+        long start1 = System.currentTimeMillis();
         int contact = contactRepository.countContact();
+        long end1 = System.currentTimeMillis();
+        System.out.println("countContact: " + (end1 - start1) + "ms");
+
         // 群聊数量
+        long start2 = System.currentTimeMillis();
         int chatRoom = chatRoomRepository.countChatRoom();
+        long end2 = System.currentTimeMillis();
+        System.out.println("countChatRoom: " + (end2 - start2) + "ms");
+
         // 今日发送消息数量
+        long start3 = System.currentTimeMillis();
         int sent = msgRepository.countSent();
+        long end3 = System.currentTimeMillis();
+        System.out.println("countSent: " + (end3 - start3) + "ms");
+
         // 今日接收消息数量
+        long start4 = System.currentTimeMillis();
         int received = msgRepository.countReceived();
+        long end4 = System.currentTimeMillis();
+        System.out.println("countReceived: " + (end4 - start4) + "ms");
+
         // 返回数据
         return new StatsPanelVO(contact, chatRoom, sent, received);
     }

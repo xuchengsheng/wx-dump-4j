@@ -8,6 +8,7 @@ import com.xcs.wx.domain.vo.ExportContactVO;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 联系人 Repository
@@ -39,6 +40,13 @@ public interface ContactRepository {
      * @return 昵称
      */
     String getContactNickname(String userName);
+
+    /**
+     * 查询联系人与公众号的Id
+     *
+     * @return Contact
+     */
+    Set<String> getContactWithMp();
 
     /**
      * 获取联系人名称

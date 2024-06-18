@@ -16,10 +16,7 @@ import com.xcs.wx.mapper.ContactMapper;
 import com.xcs.wx.repository.ContactRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +55,11 @@ public class ContactRepositoryImpl extends ServiceImpl<ContactMapper, Contact> i
 
         // 如果备注不为空则取备注，否则取联系人的昵称
         return StrUtil.isNotBlank(contact.getRemark()) ? contact.getRemark() : contact.getNickName();
+    }
+
+    @Override
+    public Set<String> getContactWithMp() {
+        return getBaseMapper().getContactWithMp();
     }
 
     @Override

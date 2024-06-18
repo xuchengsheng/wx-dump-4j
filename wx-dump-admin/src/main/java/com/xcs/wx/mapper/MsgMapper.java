@@ -5,7 +5,6 @@ import com.xcs.wx.domain.Msg;
 import com.xcs.wx.domain.vo.CountRecentMsgsVO;
 import com.xcs.wx.domain.vo.MsgTypeDistributionVO;
 import com.xcs.wx.domain.vo.TopContactsVO;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,21 +15,6 @@ import java.util.List;
  * @date 2023年12月22日 13时51分
  **/
 public interface MsgMapper extends BaseMapper<Msg> {
-
-    /**
-     * 获得最大的序列号
-     *
-     * @return 最大序列号
-     */
-    Long getNextSequence();
-
-    /**
-     * 根据数量与序列号获取消息
-     *
-     * @param nextSequence 序列号
-     * @return Msg
-     */
-    List<Msg> queryMsgBySequence(@Param("nextSequence") Long nextSequence);
 
     /**
      * 微信消息类型及其分布统计
