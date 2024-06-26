@@ -5,15 +5,16 @@ import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
-import com.xcs.wx.domain.vo.WeChatVO;
 import com.xcs.wx.repository.HardLinkImageAttributeRepository;
 import com.xcs.wx.service.ImageService;
+import com.xcs.wx.service.UserService;
+import com.xcs.wx.util.DirUtil;
 import com.xcs.wx.util.ImgDecoderUtil;
-import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.FileSystems;
+import java.util.UUID;
 
 /**
  * 图片服务
@@ -26,46 +27,42 @@ import java.nio.file.FileSystems;
 public class ImageServiceImpl implements ImageService {
 
     private final HardLinkImageAttributeRepository hardLinkImageAttributeRepository;
+    private final UserService userService;
 
     @Override
     public String downloadImgMd5(String md5) {
-        // 获得工作目录
-        String userDir = System.getProperty("user.dir");
-        // 文件分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 查询数据库
         String imgUrl = hardLinkImageAttributeRepository.queryHardLinkImage(HexUtil.decodeHex(md5));
         // 查询结果为空，返回404
         if (StrUtil.isBlank(imgUrl)) {
-            return userDir + separator + "asset" + separator + "404.png";
+            return DirUtil.notFoundImg();
         }
         // 获取用户信息
-        WeChatVO user = UserUtil.getUser();
+        String wxId = userService.currentUser();
         // 获得文件目录
-        String filePath = user.getBasePath() + "\\" + user.getWxId() + imgUrl;
-        // 检查文件是否存在，返回404
+        String filePath = DirUtil.getDirWithoutUser(userService.getBasePath(wxId), wxId, imgUrl);
+        // 检查文件是否存在
         if (!FileUtil.exist(filePath)) {
-            return userDir + separator + "asset" + separator + "404.png";
+            // 返回404
+            return DirUtil.notFoundImg();
         }
-        String outPath = userDir + separator + "data" + separator + "img";
+        String outPath = DirUtil.getDir("data", "db", wxId, "img");
         // 解密并返回
         return ImgDecoderUtil.decodeDat(filePath, outPath);
     }
 
     @Override
     public String downloadImg(String path) {
-        // 获得工作目录
-        String userDir = System.getProperty("user.dir");
-        // 文件分隔符
-        String separator = FileSystems.getDefault().getSeparator();
+        // 获取用户信息
+        String wxId = userService.currentUser();
         // 返回默认图片
-        String destPath = userDir + separator + "data" + separator + "img" + separator + IdUtil.fastSimpleUUID() + ".gif";
+        String destPath = DirUtil.getDirFileName(IdUtil.fastSimpleUUID() + ".gif", "data", "db", wxId, "img");
         // 下载图片
         try {
             HttpUtil.downloadFile(path, destPath);
         } catch (Exception e) {
             // 返回404
-            return userDir + separator + "asset" + separator + "404.png";
+            return DirUtil.notFoundImg();
         }
         // 返回下载后的图片
         return destPath;
@@ -73,19 +70,16 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String downloadImgFormLocal(String localPath) {
-        // 获得工作目录
-        String userDir = System.getProperty("user.dir");
-        // 文件分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 获取用户信息
-        WeChatVO user = UserUtil.getUser();
+        String wxId = userService.currentUser();
         // 获得文件目录
-        String filePath = user.getBasePath() + "\\" + user.getWxId() + "\\" + localPath;
+        String filePath = DirUtil.getDirWithoutUser(userService.getBasePath(wxId), wxId, localPath);
         // 检查文件是否存在，返回404
         if (!FileUtil.exist(filePath)) {
-            return userDir + separator + "asset" + separator + "404.png";
+            return DirUtil.notFoundImg();
         }
-        String outPath = userDir + separator + "data" + separator + "img";
+        String outPath = DirUtil.getDir("data", "db", wxId, "img");
+        // 检查文件是否存在
         if (!FileUtil.exist(outPath)) {
             FileUtil.mkdir(outPath);
         }

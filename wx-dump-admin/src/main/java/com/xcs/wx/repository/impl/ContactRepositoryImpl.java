@@ -2,6 +2,7 @@ package com.xcs.wx.repository.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -55,6 +56,19 @@ public class ContactRepositoryImpl extends ServiceImpl<ContactMapper, Contact> i
 
         // 如果备注不为空则取备注，否则取联系人的昵称
         return StrUtil.isNotBlank(contact.getRemark()) ? contact.getRemark() : contact.getNickName();
+    }
+
+    @Override
+    public String getNickName(String userName) {
+        DynamicDataSourceContextHolder.push(userName + "#" + DataSourceType.MICRO_MSG_DB);
+        LambdaQueryWrapper<Contact> wrapper = Wrappers.<Contact>lambdaQuery()
+                .select(Contact::getNickName)
+                .eq(Contact::getUserName, userName);
+        String nickName = Optional.ofNullable(super.getOne(wrapper))
+                .map(Contact::getNickName)
+                .orElse(null);
+        DynamicDataSourceContextHolder.clear();
+        return nickName;
     }
 
     @Override

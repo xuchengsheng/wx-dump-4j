@@ -2,6 +2,7 @@ package com.xcs.wx.constant;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.xcs.wx.service.UserService;
 
 import javax.sql.DataSource;
 import java.util.Comparator;
@@ -58,7 +59,7 @@ public class DataSourceType {
      * @return 数据库名称
      */
     public static List<String> getMsgDb() {
-        return getDb("MSG.*\\.db");
+        return getDb(SpringUtil.getBean(UserService.class).currentUser() + "#" + "MSG.*\\.db");
     }
 
     /**

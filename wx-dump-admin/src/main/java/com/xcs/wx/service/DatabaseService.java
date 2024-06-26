@@ -1,6 +1,7 @@
 package com.xcs.wx.service;
 
 import com.xcs.wx.domain.dto.DecryptDTO;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * 注册数据源
@@ -12,6 +13,9 @@ public interface DatabaseService {
 
     /**
      * 数据库解密
+     *
+     * @param emitter    sse发送事件对象
+     * @param decryptDTO 解密信息
      */
-    void decrypt(DecryptDTO decryptDTO);
+    void decrypt(SseEmitter emitter, DecryptDTO decryptDTO);
 }

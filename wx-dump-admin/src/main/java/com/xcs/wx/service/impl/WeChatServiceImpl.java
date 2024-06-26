@@ -2,7 +2,6 @@ package com.xcs.wx.service.impl;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.HexUtil;
-import cn.hutool.core.util.StrUtil;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -10,11 +9,10 @@ import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 import com.xcs.wx.config.WeChatOffsetProperties;
-import com.xcs.wx.domain.vo.WeChatVO;
+import com.xcs.wx.domain.vo.WeChatConfigVO;
 import com.xcs.wx.exception.BizException;
 import com.xcs.wx.service.WeChatService;
 import com.xcs.wx.util.Pbkdf2HmacUtil;
-import com.xcs.wx.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,7 +24,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -63,51 +60,46 @@ public class WeChatServiceImpl implements WeChatService {
     private final WeChatOffsetProperties weChatOffsetConfig;
 
     @Override
-    public WeChatVO queryWeChat() {
+    public List<WeChatConfigVO> readWeChatConfig() {
         // 获取微信进程Id
-        int pid = pid();
+        List<Integer> pidList = wechatPid();
         // 微信未登录
-        if (pid == 0) {
+        if (pidList.isEmpty()) {
             throw new BizException(-1, "检测到微信尚未启动，请先打开微信以继续进行操作。");
         }
-        // 获取版本号
-        String version = getVersion(pid);
-        // 支持最小的版本号
-        String supportMinVersion = weChatOffsetConfig.getVersion().keySet().stream().findFirst().orElse("0.0.0.0");
-        // 校验版本号
-        if (compareVersions(supportMinVersion, version)) {
-            throw new BizException(-1, "当前微信版本不支持,请升级微信最新版本,当前微信版本号:" + version);
+        List<WeChatConfigVO> weChatConfigVOList = new ArrayList<>();
+        // 遍历微信Id列表
+        for (Integer pid : pidList) {
+            // 获取版本号
+            String version = getVersion(pid);
+            // 支持最小的版本号
+            String supportMinVersion = weChatOffsetConfig.getVersion().keySet().stream().findFirst().orElse("0.0.0.0");
+            // 校验版本号
+            if (compareVersions(supportMinVersion, version)) {
+                throw new BizException(-1, "当前微信版本不支持,请升级微信最新版本,当前微信版本号:" + version);
+            }
+            // 读取微信版本对应的偏移量
+            WeChatOffsetProperties.VersionConfig versionConfig = getVersionConfig(version);
+            // 未读取到偏移量
+            if (versionConfig == null) {
+                throw new BizException(-1, "未读取到偏移量配置,请从Github获取最新代码,当前微信版本号:" + version);
+            }
+            // 获取微信的基址
+            long baseAddress = baseAddress(pid);
+            // 获取微信昵称
+            String nickname = getInfo(pid, (baseAddress + versionConfig.getNickname()));
+            // 获取微信账号
+            String account = getInfo(pid, (baseAddress + versionConfig.getAccount()));
+            // 获取微信手机号
+            String mobile = getInfo(pid, (baseAddress + versionConfig.getMobile()));
+            // 获取微信文件目录
+            String basePath = getBasePath();
+            // 获取微信Id
+            String wxId = getWxId(pid);
+            // 返回配置信息
+            weChatConfigVOList.add(new WeChatConfigVO(pid, baseAddress, version, nickname, account, mobile, basePath, wxId));
         }
-        // 读取微信版本对应的偏移量
-        WeChatOffsetProperties.VersionConfig versionConfig = getVersionConfig(version);
-        // 未读取到偏移量
-        if (versionConfig == null) {
-            throw new BizException(-1, "未读取到偏移量配置,请从Github获取最新代码,当前微信版本号:" + version);
-        }
-        // 获取微信的基址
-        long baseAddress = baseAddress(pid);
-        // 获取微信昵称
-        String nickname = getInfo(pid, (baseAddress + versionConfig.getNickname()));
-        // 获取微信账号
-        String account = getInfo(pid, (baseAddress + versionConfig.getAccount()));
-        // 获取微信手机号
-        String mobile = getInfo(pid, (baseAddress + versionConfig.getMobile()));
-        // 获取微信文件目录
-        String basePath = getBasePath();
-        // 获取微信Id
-        String wxId = getWxId(pid);
-        // 获取微信秘钥
-        String key = getKey(pid, basePath + FileSystems.getDefault().getSeparator() + wxId);
-        // 获取微信秘钥失败
-        if (StrUtil.isBlank(key)) {
-            throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
-        }
-        // 返回配置信息
-        WeChatVO weChatVO = new WeChatVO(pid, baseAddress, version, nickname, account, mobile, key, basePath, wxId);
-        // 保存用户信息
-        UserUtil.saveUser(weChatVO);
-        // 返回
-        return weChatVO;
+        return weChatConfigVOList;
     }
 
     /**
@@ -152,7 +144,9 @@ public class WeChatServiceImpl implements WeChatService {
      *
      * @return 微信进程的进程 ID。如果未找到，返回 0。
      */
-    private int pid() {
+    @Override
+    public List<Integer> wechatPid() {
+        List<Integer> pidList = new ArrayList<>();
         // 实例化Kernel32库接口
         Kernel32 kernel32 = Kernel32.INSTANCE;
 
@@ -168,10 +162,8 @@ public class WeChatServiceImpl implements WeChatService {
                 String exeName = Native.toString(pe32.szExeFile);
                 // 检查进程名是否为目标进程名
                 if (exeName.equalsIgnoreCase(EXE_NAME)) {
-                    // 关闭快照句柄
-                    kernel32.CloseHandle(hSnapshot);
                     // 返回找到的进程ID
-                    return pe32.th32ProcessID.intValue();
+                    pidList.add(pe32.th32ProcessID.intValue());
                 }
                 // 继续遍历下一个进程
             } while (kernel32.Process32Next(hSnapshot, pe32));
@@ -179,7 +171,7 @@ public class WeChatServiceImpl implements WeChatService {
         // 关闭快照句柄
         kernel32.CloseHandle(hSnapshot);
         // 如果没有找到进程，返回0
-        return 0;
+        return pidList;
     }
 
     /**
@@ -188,7 +180,8 @@ public class WeChatServiceImpl implements WeChatService {
      * @param pid 目标进程的 ID。
      * @return 进程的模块基地址，如果找不到则返回 0。
      */
-    private long baseAddress(int pid) {
+    @Override
+    public long baseAddress(int pid) {
         Kernel32 kernel32 = Kernel32.INSTANCE;
 
         // 创建模块快照
@@ -226,7 +219,8 @@ public class WeChatServiceImpl implements WeChatService {
      * @param address 要读取的内存地址。
      * @return 读取到的数据，如果失败则返回 null。
      */
-    private String getInfo(int pid, long address) {
+    @Override
+    public String getInfo(int pid, long address) {
         Kernel32 kernel32 = Kernel32.INSTANCE;
         // 打开目标进程
         WinNT.HANDLE process = kernel32.OpenProcess(WinNT.PROCESS_VM_READ, false, pid);
@@ -269,7 +263,8 @@ public class WeChatServiceImpl implements WeChatService {
      * @param dbPath 数据库路径
      * @return 返回找到的密钥，如果未找到则返回null
      */
-    private String getKey(int pid, String dbPath) {
+    @Override
+    public String getKey(int pid, String dbPath) {
         // 打开目标进程
         WinNT.HANDLE process = Kernel32.INSTANCE.OpenProcess(0x1F0FFF, false, pid);
 
@@ -569,7 +564,8 @@ public class WeChatServiceImpl implements WeChatService {
      * @param pid 目标进程ID
      * @return 微信ID
      */
-    private String getWxId(int pid) {
+    @Override
+    public String getWxId(int pid) {
         // 获取Kernel32实例
         Kernel32 kernel32 = Kernel32.INSTANCE;
         // 打开目标进程句柄
@@ -726,6 +722,7 @@ public class WeChatServiceImpl implements WeChatService {
      * @param pid 进程ID。
      * @return 文件的版本号，如果无法获取，则返回 null。
      */
+    @Override
     public String getVersion(int pid) {
         // 获取指定进程ID的可执行文件路径。
         String filePath = getExecutablePath(pid);

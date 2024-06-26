@@ -2,6 +2,15 @@ chcp 65001
 @echo off
 setlocal enabledelayedexpansion
 
+java -version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo 未检测到 Java 环境，请先安装 Java。
+    echo 您可以访问 https://www.oracle.com/java/technologies/downloads/#java17 下载并安装。
+    echo 安装完成后，请重新运行此脚本。
+    pause
+    exit /b
+)
+
 cd %~dp0
 
 set LOG_HOME=%~dp0/../logs
@@ -21,7 +30,7 @@ set JAVA_OPTS=%JAVA_OPTS% -XX:HeapDumpPath=%LOG_HOME%\heapdump.hprof
 set JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8
 set JAVA_OPTS=%JAVA_OPTS% -XX:-OmitStackTraceInFastThrow
 
-echo Starting the %SERVER_NAME% ...
+echo 正在启动 %SERVER_NAME% ...
 
 java %JAVA_OPTS% -Dspring.thymeleaf.prefix=file:../html/ -Dlog.home=%LOG_HOME% -classpath %CLASS_PATH% com.xcs.wx.WxDumpApplication
 

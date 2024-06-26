@@ -2,13 +2,13 @@ package com.xcs.wx.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.excel.EasyExcel;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xcs.wx.constant.ChatRoomConstant;
 import com.xcs.wx.domain.Msg;
 import com.xcs.wx.domain.vo.ExportMsgVO;
 import com.xcs.wx.domain.vo.MsgVO;
-import com.xcs.wx.domain.vo.WeChatVO;
 import com.xcs.wx.mapping.MsgMapping;
 import com.xcs.wx.msg.MsgStrategy;
 import com.xcs.wx.msg.MsgStrategyFactory;
@@ -17,7 +17,7 @@ import com.xcs.wx.repository.ContactHeadImgUrlRepository;
 import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.repository.MsgRepository;
 import com.xcs.wx.service.MsgService;
-import com.xcs.wx.util.UserUtil;
+import com.xcs.wx.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,13 +47,11 @@ public class MsgServiceImpl implements MsgService {
     @Override
     public List<MsgVO> queryMsg(String talker, Long nextSequence) {
         List<Msg> allData = msgRepository.queryMsgByTalker(talker, nextSequence);
-        // 获取用户信息
-        WeChatVO user = UserUtil.getUser();
         // 根据时间排序
         return msgMapping.convert(allData).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
                 // 遍历数据
                 .peek(msgVO -> {
-                    msgVO.setWxId(getChatWxId(talker, msgVO, user));
+                    msgVO.setWxId(getChatWxId(talker, msgVO));
                     // 设置处理日期
                     msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
                     // 设置聊天头像
@@ -70,13 +68,11 @@ public class MsgServiceImpl implements MsgService {
     @Override
     public String exportMsg(String talker) {
         List<Msg> msgList = msgRepository.exportMsg(talker);
-        // 获取用户信息
-        WeChatVO user = UserUtil.getUser();
         // 根据时间排序
         List<MsgVO> msgVOList = msgMapping.convert(msgList).stream().sorted(Comparator.comparing(MsgVO::getCreateTime))
                 // 遍历数据
                 .peek(msgVO -> {
-                    msgVO.setWxId(getChatWxId(talker, msgVO, user));
+                    msgVO.setWxId(getChatWxId(talker, msgVO));
                     // 设置处理日期
                     msgVO.setStrCreateTime(DateUtil.formatDateTime(new Date(msgVO.getCreateTime() * 1000)));
                     // 读取消息类型策略
@@ -107,13 +103,12 @@ public class MsgServiceImpl implements MsgService {
      *
      * @param talker 聊天对话者
      * @param msgVO  消息VO
-     * @param user   用户信息
-     * @return wxid
+     * @return wxId
      */
-    private String getChatWxId(String talker, MsgVO msgVO, WeChatVO user) {
+    private String getChatWxId(String talker, MsgVO msgVO) {
         // 我发送的消息
         if (msgVO.getIsSender() == 1) {
-            return user.getWxId();
+            return SpringUtil.getBean(UserService.class).currentUser();
         }
         // 我接受的消息
         try {

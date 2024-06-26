@@ -1,6 +1,7 @@
 package com.xcs.wx.repository.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,13 +40,12 @@ public class ContactHeadImgUrlRepositoryImpl extends ServiceImpl<ContactHeadImgU
 
     @Override
     public String queryHeadImgUrlByUserName(String userName) {
-        // 构建查询条件
         Wrapper<ContactHeadImgUrl> wrapper = Wrappers.<ContactHeadImgUrl>lambdaQuery()
                 .select(ContactHeadImgUrl::getUsrName, ContactHeadImgUrl::getSmallHeadImgUrl)
                 .eq(ContactHeadImgUrl::getUsrName, userName);
-        // 返回联系人头像
-        return Optional.ofNullable(super.getOne(wrapper))
+        String smallHeadImgUrl = Optional.ofNullable(super.getOne(wrapper))
                 .map(ContactHeadImgUrl::getSmallHeadImgUrl)
                 .orElse(null);
+        return smallHeadImgUrl;
     }
 }

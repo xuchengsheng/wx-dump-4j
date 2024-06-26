@@ -1,6 +1,5 @@
 package com.xcs.wx.service.impl;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.HexUtil;
 import com.xcs.wx.domain.bo.DecryptBO;
 import com.xcs.wx.service.DecryptService;
@@ -53,7 +52,6 @@ public class DecryptServiceImpl implements DecryptService {
 
     @Override
     public void wechatDecrypt(String password, DecryptBO decryptBO) {
-        long start = System.currentTimeMillis();
         // 创建File文件
         File file = new File(decryptBO.getInput());
 
@@ -117,6 +115,11 @@ public class DecryptServiceImpl implements DecryptService {
                         byte[] page = new byte[DEFAULT_PAGESIZE];
                         fileContent.get(page);
 
+                        // 判断是否是填充页面，如果是则跳过后续处理
+                        if (isPaddingPage(page)) {
+                            break;
+                        }
+
                         byte[] iv = Arrays.copyOfRange(page, page.length - 48, page.length - 32);
                         byte[] body = Arrays.copyOfRange(page, 0, page.length - 48);
                         byte[] reservedSegment = Arrays.copyOfRange(page, page.length - 48, page.length);
@@ -137,9 +140,21 @@ public class DecryptServiceImpl implements DecryptService {
         } catch (Exception e) {
             log.error("WeChat decryption failed", e);
         }
-        long end = System.currentTimeMillis();
+    }
 
-        log.info(FileUtil.getName("解密" + decryptBO.getInput()) + "耗时：" + (end - start) + "ms");
+    /**
+     * 检查页面是否为填充页面
+     *
+     * @param page 页面数据
+     * @return 如果是填充页面返回true，否则返回false
+     */
+    private boolean isPaddingPage(byte[] page) {
+        for (byte b : page) {
+            if (b != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

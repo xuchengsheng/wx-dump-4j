@@ -12,44 +12,50 @@
  */
 export default [
   {
-    path: '/dashboard/wechat',
+    path: '/dashboard',
     name: '仪表台',
     icon: 'DashboardOutlined',
-    component: './Dashboard/WeChat',
+    component: './Dashboard',
   },
   {
-    path: '/wechat/session',
+    path: '/session',
     name: '会话管理',
     icon: 'MessageOutlined',
-    component: './WeChat/Session',
+    component: './Session',
   },
   {
-    path: '/wechat/contact',
+    path: '/contact',
     name: '好友管理',
     icon: 'UsergroupAddOutlined',
-    component: './WeChat/Contact',
+    component: './Contact',
   },
   {
-    path: '/wechat/chatroom',
+    path: '/chatroom',
     name: '群聊管理',
     icon: 'CommentOutlined',
-    component: './WeChat/ChatRoom',
+    component: './ChatRoom',
   },
   {
-    path: '/wechat/feeds',
+    path: '/feeds',
     name: '朋友圈管理',
     icon: 'ChromeOutlined',
-    component: './WeChat/Feeds',
+    component: './Feeds',
   },
   {
-    path: '/wechat/recoverContact',
+    path: '/recoverContact',
     name: '找回好友',
     icon: 'RotateRightOutlined',
-    component: './WeChat/RecoverContact',
+    component: './RecoverContact',
+  },
+  {
+    path: '/decryptTool',
+    name: '解密工具',
+    icon: 'ToolOutlined',
+    component: './DecryptTool',
   },
   {
     path: '/',
-    redirect: '/wechat/session',
+    redirect: '/session',
   },
   {
     path: '*',

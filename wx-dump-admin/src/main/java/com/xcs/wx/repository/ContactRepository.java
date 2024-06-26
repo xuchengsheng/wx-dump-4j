@@ -42,6 +42,14 @@ public interface ContactRepository {
     String getContactNickname(String userName);
 
     /**
+     * 获取联系人名称
+     *
+     * @param userName 用户名
+     * @return 昵称
+     */
+    String getNickName(String userName);
+
+    /**
      * 查询联系人与公众号的Id
      *
      * @return Contact

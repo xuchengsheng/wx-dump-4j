@@ -1,11 +1,13 @@
-import DataBase from './pages/WeChat/DataBase';
-import UserAvatar from './pages/WeChat/UserAvatar';
-
+import UserName from './pages/UserName';
+import SwitchUser from './pages/SwitchUser';
+import Github from './pages/Components/Github';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+import React from 'react';
+import useUserData from './pages/useUserData';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -20,11 +22,19 @@ export async function getInitialState(): Promise<{
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+
+  const { avatarUrl } = useUserData();
+
   return {
-    actionsRender: () => [<DataBase key="db" />],
+    actionsRender: () => [<Github />],
     avatarProps: {
-      title: <UserAvatar/>
+      src: avatarUrl || '/img/icon-default-avatar.png',
+      title: <UserName />,
+      render: (_, avatarChildren) => {
+        return <SwitchUser>{avatarChildren}</SwitchUser>;
+      },
     },
+    siderWidth:200,
     onPageChange: () => {
 
     },

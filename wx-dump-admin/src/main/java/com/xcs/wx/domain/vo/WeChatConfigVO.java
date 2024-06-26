@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class WeChatVO {
+public class WeChatConfigVO {
 
     /**
      * 进程Id
@@ -42,11 +42,6 @@ public class WeChatVO {
      * 手机号
      */
     private String mobile;
-
-    /**
-     * 秘钥
-     */
-    private String key;
 
     /**
      * 文件目录

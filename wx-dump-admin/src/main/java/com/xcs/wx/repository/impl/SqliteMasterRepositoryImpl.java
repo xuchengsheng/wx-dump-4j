@@ -1,14 +1,17 @@
 package com.xcs.wx.repository.impl;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xcs.wx.constant.DataSourceType;
 import com.xcs.wx.domain.SqliteMaster;
 import com.xcs.wx.mapper.SqliteMasterMapper;
 import com.xcs.wx.repository.SqliteMasterRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@DS(value = DataSourceType.MICRO_MSG_DB)
 public class SqliteMasterRepositoryImpl extends ServiceImpl<SqliteMasterMapper, SqliteMaster> implements SqliteMasterRepository {
 
     @Override

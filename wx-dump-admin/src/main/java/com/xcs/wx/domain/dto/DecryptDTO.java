@@ -6,9 +6,9 @@ import lombok.Data;
 public class DecryptDTO {
 
     /**
-     * 秘钥
+     * pid
      */
-    private String key;
+    private int pid;
 
     /**
      * 文件目录
@@ -19,4 +19,9 @@ public class DecryptDTO {
      * 微信Id
      */
     private String wxId;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
 }
