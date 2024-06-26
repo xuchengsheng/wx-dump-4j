@@ -1,0 +1,85 @@
+.chat-scrollbar {
+  height: 650px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 5px;
+
+    &:hover {
+      background-color: #555;
+    }
+  }
+}
+
+.more-msg {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.msg-item {
+  margin-top: 25px;
+  margin-bottom: 25px;
+
+  &.sender {
+    justify-content: flex-end;
+
+    .msg-content {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &.receiver {
+    justify-content: flex-start;
+
+    .msg-content {
+      flex-direction: row;
+    }
+  }
+}
+
+.msg-system {
+  margin-top: 16px;
+}
+
+.msg-system-text {
+  max-width: 500px;
+  font-size: 12px;
+}
+
+.message-text {
+  max-width: 400px;
+  padding: 10px;
+  border-radius: 10px;
+
+  &.sender {
+    background-color: #b9fb97;
+  }
+
+  &.receiver {
+    background-color: #eff2f2;
+  }
+}
+
+.msg-card-link {
+  width: 400px;
+}
+
+.msg-we-app-info {
+  width: 200px;
+}
+
+.refer-msg-content {
+  max-width: 400px;
+  margin-top: 5px;
+}
+
+.msg-avatar {
+  margin-right: 15px;
+  margin-left: 15px;
+}

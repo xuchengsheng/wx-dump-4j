@@ -1,0 +1,34 @@
+.session-scrollbar {
+  height: 675px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 5px;
+
+    &:hover {
+      background-color: #555;
+    }
+  }
+
+  .sessionItem {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 15px;
+    padding-left: 15px;
+
+    &.highlighted {
+      background-color: #f0f0f0;
+    }
+  }
+
+  .timeText {
+    color: gray;
+    font-size: 13px;
+  }
+}
