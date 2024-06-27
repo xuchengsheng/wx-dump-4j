@@ -5,6 +5,8 @@ import com.xcs.wx.domain.HardLinkImageAttribute;
 import org.apache.ibatis.annotations.Param;
 
 /**
+ * 图片链接 Mapper
+ *
  * @author xcs
  * @date 2024年1月16日21:50:13
  */
@@ -13,8 +15,8 @@ public interface HardLinkImageAttributeMapper extends BaseMapper<HardLinkImageAt
     /**
      * 查询图片
      *
-     * @param md5
-     * @return
+     * @param md5 md5
+     * @return 图片
      */
     String queryHardLinkImage(@Param("md5") byte[] md5);
 }

@@ -11,17 +11,23 @@ import com.xcs.wx.service.UserService;
 import com.xcs.wx.util.DirUtil;
 import com.xcs.wx.util.ImgDecoderUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.FileSystems;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
- * 图片服务
+ * 图片服务实现
  *
  * @author xcs
  * @date 2024年1月18日22:06:46
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
@@ -30,60 +36,92 @@ public class ImageServiceImpl implements ImageService {
     private final UserService userService;
 
     @Override
-    public String downloadImgMd5(String md5) {
-        // 查询数据库
-        String imgUrl = hardLinkImageAttributeRepository.queryHardLinkImage(HexUtil.decodeHex(md5));
-        // 查询结果为空，返回404
-        if (StrUtil.isBlank(imgUrl)) {
-            return DirUtil.notFoundImg();
+    public ResponseEntity<Resource> downloadImgMd5(String md5) {
+        try {
+            // 查询数据库
+            String imgUrl = hardLinkImageAttributeRepository.queryHardLinkImage(HexUtil.decodeHex(md5));
+            // 查询结果为空，返回404
+            if (StrUtil.isBlank(imgUrl)) {
+                return ResponseEntity.notFound().build();
+            }
+            // 获取用户信息
+            String wxId = userService.currentUser();
+            // 获得文件目录
+            String filePath = DirUtil.getImgDir(userService.getBasePath(wxId), wxId, imgUrl);
+            // 检查文件是否存在
+            if (!FileUtil.exist(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            // 获取图片文件夹地址
+            String outPath = DirUtil.getImgDir(wxId);
+            // 解密并返回
+            String imgPath = ImgDecoderUtil.decodeDat(filePath, outPath);
+            // 如果图片地址为空
+            if (imgPath == null) {
+                return ResponseEntity.notFound().build();
+            }
+            // 返回图片
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(Files.newInputStream(Paths.get(imgPath))));
+        } catch (Exception e) {
+            log.error("downloadImgMd5 error", e);
         }
-        // 获取用户信息
-        String wxId = userService.currentUser();
-        // 获得文件目录
-        String filePath = DirUtil.getDirWithoutUser(userService.getBasePath(wxId), wxId, imgUrl);
-        // 检查文件是否存在
-        if (!FileUtil.exist(filePath)) {
-            // 返回404
-            return DirUtil.notFoundImg();
-        }
-        String outPath = DirUtil.getDir("data", "db", wxId, "img");
-        // 解密并返回
-        return ImgDecoderUtil.decodeDat(filePath, outPath);
+        // 默认返回404
+        return ResponseEntity.notFound().build();
     }
 
     @Override
-    public String downloadImg(String path) {
+    public ResponseEntity<Resource> downloadImg(String path) {
         // 获取用户信息
         String wxId = userService.currentUser();
         // 返回默认图片
-        String destPath = DirUtil.getDirFileName(IdUtil.fastSimpleUUID() + ".gif", "data", "db", wxId, "img");
-        // 下载图片
+        String destPath = DirUtil.getImgDirWithName(wxId, IdUtil.fastSimpleUUID() + ".gif");
         try {
+            // 下载图片
             HttpUtil.downloadFile(path, destPath);
+            // 返回图片
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(Files.newInputStream(Paths.get(destPath))));
         } catch (Exception e) {
-            // 返回404
-            return DirUtil.notFoundImg();
+            log.error("downloadImg error", e);
         }
-        // 返回下载后的图片
-        return destPath;
+        // 默认返回404
+        return ResponseEntity.notFound().build();
     }
 
     @Override
-    public String downloadImgFormLocal(String localPath) {
-        // 获取用户信息
-        String wxId = userService.currentUser();
-        // 获得文件目录
-        String filePath = DirUtil.getDirWithoutUser(userService.getBasePath(wxId), wxId, localPath);
-        // 检查文件是否存在，返回404
-        if (!FileUtil.exist(filePath)) {
-            return DirUtil.notFoundImg();
+    public ResponseEntity<Resource> downloadImgFormLocal(String localPath) {
+        try {
+            // 获取用户信息
+            String wxId = userService.currentUser();
+            // 获得文件目录
+            String filePath = DirUtil.getImgDir(userService.getBasePath(wxId), wxId, localPath);
+            // 检查文件是否存在，返回404
+            if (!FileUtil.exist(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            // 获取图片文件夹地址
+            String outPath = DirUtil.getImgDir(wxId);
+            // 检查文件是否存在
+            if (!FileUtil.exist(outPath)) {
+                FileUtil.mkdir(outPath);
+            }
+            // 解密并返回
+            String imgPath = ImgDecoderUtil.decodeDat(filePath, outPath);
+            // 如果图片地址为空
+            if (imgPath == null) {
+                return ResponseEntity.notFound().build();
+            }
+            // 返回图片
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(Files.newInputStream(Paths.get(imgPath))));
+        } catch (Exception e) {
+            log.error("downloadImgFormLocal error", e);
         }
-        String outPath = DirUtil.getDir("data", "db", wxId, "img");
-        // 检查文件是否存在
-        if (!FileUtil.exist(outPath)) {
-            FileUtil.mkdir(outPath);
-        }
-        // 解密并返回
-        return ImgDecoderUtil.decodeDat(filePath, outPath);
+        // 默认返回404
+        return ResponseEntity.notFound().build();
     }
 }

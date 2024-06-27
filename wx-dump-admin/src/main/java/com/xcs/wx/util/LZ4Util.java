@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * LZ4 解压
+ * LZ4 解压工具类
  *
  * @author xcs
  * @date 2023年12月31日14:58:01
@@ -16,7 +16,8 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class LZ4Util {
 
-    private LZ4Util(){}
+    private LZ4Util() {
+    }
 
     /**
      * 解压

@@ -2,17 +2,12 @@ package com.xcs.wx.controller;
 
 import com.xcs.wx.service.ImageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * 图片 Controller
@@ -34,12 +29,8 @@ public class ImageController {
      * @return 图片
      */
     @GetMapping("/downloadImgMd5")
-    public ResponseEntity<Resource> downloadImgMd5(@RequestParam String md5) throws IOException {
-        String imgUrl = imageService.downloadImgMd5(md5);
-        InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(imageStream);
+    public ResponseEntity<Resource> downloadImgMd5(@RequestParam String md5) {
+        return imageService.downloadImgMd5(md5);
     }
 
     /**
@@ -49,12 +40,8 @@ public class ImageController {
      * @return 图片
      */
     @GetMapping("/downloadImg")
-    public ResponseEntity<Resource> downloadImg(@RequestParam String path) throws IOException {
-        String imgUrl = imageService.downloadImg(path);
-        InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(imageStream);
+    public ResponseEntity<Resource> downloadImg(@RequestParam String path) {
+        return imageService.downloadImg(path);
     }
 
     /**
@@ -64,11 +51,7 @@ public class ImageController {
      * @return 图片
      */
     @GetMapping("/downloadImgFormLocal")
-    public ResponseEntity<Resource> downloadImgFormLocal(@RequestParam String localPath) throws IOException {
-        String imgUrl = imageService.downloadImgFormLocal(localPath);
-        InputStreamResource imageStream = new InputStreamResource(new FileInputStream(imgUrl));
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(imageStream);
+    public ResponseEntity<Resource> downloadImgFormLocal(@RequestParam String localPath) {
+        return imageService.downloadImgFormLocal(localPath);
     }
 }

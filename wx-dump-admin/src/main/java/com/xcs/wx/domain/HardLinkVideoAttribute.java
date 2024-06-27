@@ -7,6 +7,8 @@ import lombok.Data;
 import org.apache.ibatis.type.ByteArrayTypeHandler;
 
 /**
+ * 视频链接表
+ *
  * @author xcs
  * @date 2024年02月07日 15时24分
  **/

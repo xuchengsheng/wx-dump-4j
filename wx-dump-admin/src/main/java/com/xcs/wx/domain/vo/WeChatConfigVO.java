@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * WeChatConfigVO
+ *
  * @author xcs
  * @date 2023年12月25日 09时38分
  **/

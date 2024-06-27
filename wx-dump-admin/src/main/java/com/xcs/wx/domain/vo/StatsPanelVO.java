@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * StatsPanelVO
+ *
  * @author xcs
  * @date 2024年01月23日 17时25分
  **/

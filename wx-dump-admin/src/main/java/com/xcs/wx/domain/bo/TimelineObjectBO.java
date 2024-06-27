@@ -9,6 +9,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * TimelineObjectBO
+ *
  * @author xcs
  * @date 2024年01月03日 17时47分
  **/
@@ -208,7 +210,7 @@ public class TimelineObjectBO {
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public class StreamVideo {
+    public static class StreamVideo {
         @JacksonXmlProperty(localName = "streamvideourl")
         private String streamVideoUrl;
 

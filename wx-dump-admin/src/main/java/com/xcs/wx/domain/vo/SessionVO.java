@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * SessionVO
+ *
  * @author xcs
  * @date 2023年12月21日 18时13分
  **/

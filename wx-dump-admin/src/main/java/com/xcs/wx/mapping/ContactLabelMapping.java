@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 /**
- * 联系人表情 Mapping
+ * 联系人标签 Mapping
  *
  * @author xcs
  * @date 2023年12月22日 15时00分

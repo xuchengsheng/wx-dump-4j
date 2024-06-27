@@ -1,6 +1,8 @@
 package com.xcs.wx.constant;
 
 /**
+ * sqlite常量
+ *
  * @author xcs
  * @date 2024年1月20日21:12:51
  */

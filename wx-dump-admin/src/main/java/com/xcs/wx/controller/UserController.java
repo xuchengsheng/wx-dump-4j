@@ -1,6 +1,6 @@
 package com.xcs.wx.controller;
 
-import com.xcs.wx.domain.bo.UserVO;
+import com.xcs.wx.domain.vo.UserVO;
 import com.xcs.wx.domain.vo.ResponseVO;
 import com.xcs.wx.service.UserService;
 import lombok.RequiredArgsConstructor;

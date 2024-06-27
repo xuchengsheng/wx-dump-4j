@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
+ * 图片解密工具类
+ *
  * @author xcs
  * @date 2023年12月28日 15时44分
  **/

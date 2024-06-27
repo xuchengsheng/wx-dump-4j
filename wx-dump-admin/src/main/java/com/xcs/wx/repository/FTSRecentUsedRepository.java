@@ -3,6 +3,8 @@ package com.xcs.wx.repository;
 import java.util.List;
 
 /**
+ * 最新使用关键字 Repository
+ *
  * @author xcs
  * @date 2024年1月23日11:20:56
  */

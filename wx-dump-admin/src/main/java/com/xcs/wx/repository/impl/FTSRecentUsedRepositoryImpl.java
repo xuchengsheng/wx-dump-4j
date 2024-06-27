@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 最新使用关键字 Repository实现类
+ *
  * @author xcs
- * @date 2024年01月23日 11时12分
- **/
+ * @date 2024年1月23日11:20:56
+ */
 @Repository
 @DS(value = DataSourceType.FTS_CONTACT_DB)
 public class FTSRecentUsedRepositoryImpl extends ServiceImpl<FTSRecentUsedMapper, FTSRecentUsed> implements FTSRecentUsedRepository {

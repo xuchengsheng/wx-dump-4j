@@ -1,5 +1,11 @@
 package com.xcs.wx.protobuf;
 
+/**
+ * 群聊Protobuf
+ *
+ * @author xcs
+ * @date 2024年6月27日14:55:41
+ */
 @SuppressWarnings("all")
 public final class ChatRoomProto {
     private ChatRoomProto() {

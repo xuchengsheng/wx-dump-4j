@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * FTSContactContentRepository 实现类
+ * 联系人内容 Repository 实现类
  *
  * @author xcs
  * @date 2024年6月14日15:18:11

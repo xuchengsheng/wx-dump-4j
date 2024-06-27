@@ -1,4 +1,4 @@
-package com.xcs.wx.domain.bo;
+package com.xcs.wx.domain.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

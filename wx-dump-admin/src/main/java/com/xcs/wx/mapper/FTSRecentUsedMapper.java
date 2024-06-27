@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xcs.wx.domain.FTSRecentUsed;
 
 /**
- * 朋友圈 Mapper
+ * 最近使用关键字 Mapper
  *
  * @author xcs
  * @date 2023年12月22日 13时51分

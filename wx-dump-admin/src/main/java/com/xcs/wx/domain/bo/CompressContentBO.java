@@ -6,6 +6,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 /**
+ * CompressContentBO
+ *
  * @author xcs
  * @date 2024年01月16日 14时59分
  **/
@@ -13,6 +15,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "msg")
 public class CompressContentBO {
+
     @JacksonXmlProperty(localName = "appmsg")
     private AppMsg appMsg;
 

@@ -1,13 +1,17 @@
 package com.xcs.wx.domain.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
+ * ContactDTO
+ *
  * @author xcs
  * @date 2023年12月31日15:25:21
  */
 @Data
-public class ContactDTO extends PageDTO{
+@EqualsAndHashCode(callSuper = true)
+public class ContactDTO extends PageDTO {
 
     /**
      * 备注

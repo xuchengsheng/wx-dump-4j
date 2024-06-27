@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * ResponseVO
+ *
  * @author xcs
  * @date 2023年12月25日 17时31分
  **/
@@ -52,7 +54,7 @@ public class ResponseVO<T> {
      * @return ResponseDTO
      */
     public static <T> ResponseVO<T> ok(T data) {
-        ResponseVO<T> wrapper = new ResponseVO();
+        ResponseVO<T> wrapper = new ResponseVO<>();
         wrapper.setSuccess(true);
         wrapper.setData(data);
         return wrapper;
@@ -68,7 +70,7 @@ public class ResponseVO<T> {
      * @return ResponseDTO
      */
     public static <T> ResponseVO<T> ok(T data, Long page, Long total) {
-        ResponseVO<T> wrapper = new ResponseVO();
+        ResponseVO<T> wrapper = new ResponseVO<>();
         wrapper.setSuccess(true);
         wrapper.setData(data);
         wrapper.setPage(page);
@@ -83,7 +85,7 @@ public class ResponseVO<T> {
      * @return ResponseDTO
      */
     public static <T> ResponseVO<T> error(Integer errorCode, String errorMessage) {
-        ResponseVO<T> wrapper = new ResponseVO();
+        ResponseVO<T> wrapper = new ResponseVO<>();
         wrapper.setSuccess(false);
         wrapper.setErrorCode(errorCode);
         wrapper.setShowType(2);

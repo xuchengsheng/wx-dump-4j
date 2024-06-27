@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
+ * ChatRoomVO
+ *
  * @author xcs
  * @date 2024年01月08日 16时10分
  **/

@@ -5,7 +5,7 @@ import com.xcs.wx.domain.vo.RecoverContactVO;
 import org.mapstruct.Mapper;
 
 /**
- * RecoverContactMapping
+ * 找回联系人 Mapping
  *
  * @author xcs
  * @date 2024年6月14日15:57:18

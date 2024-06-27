@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * DecryptBO
+ *
  * @author xcs
  * @date 2023年12月10日20:21:02
  */

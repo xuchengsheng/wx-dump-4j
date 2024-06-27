@@ -4,6 +4,10 @@ import java.nio.file.FileSystems;
 
 public class DirUtil {
 
+    private static final String DATA = "data";
+    private static final String DB = "db";
+    private static final String IMG = "img";
+
     private DirUtil() {
     }
 
@@ -13,49 +17,7 @@ public class DirUtil {
      * @param dirs 文件夹名称
      * @return 路径
      */
-    public static String getDir(String... dirs) {
-        // 获得工作目录
-        String userDir = System.getProperty("user.dir");
-        // 文件分隔符
-        String separator = FileSystems.getDefault().getSeparator();
-        StringBuilder sb = new StringBuilder();
-        sb.append(userDir);
-        // 遍历
-        for (String dir : dirs) {
-            sb.append(separator);
-            sb.append(dir);
-        }
-        sb.append(separator);
-        return sb.toString();
-    }
-
-    /**
-     * 获得一个完整的文件夹路径
-     *
-     * @param fileName 文件名
-     * @param dirs     文件夹名称
-     * @return 路径
-     */
-    public static String getDirFileName(String fileName, String... dirs) {
-        return getDir(dirs) + fileName;
-    }
-
-    /**
-     * 图片不存在
-     *
-     * @return 路径
-     */
-    public static String notFoundImg() {
-        return getDirFileName("404.png", "asset");
-    }
-
-    /**
-     * 获得一个完整的文件夹路径
-     *
-     * @param dirs 文件夹名称
-     * @return 路径
-     */
-    public static String getDirWithoutUser(String... dirs) {
+    public static String getImgDir(String... dirs) {
         // 文件分隔符
         String separator = FileSystems.getDefault().getSeparator();
         // 拼接路径
@@ -68,5 +30,35 @@ public class DirUtil {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 获取图片文件夹地址
+     *
+     * @param wxId wxId
+     * @return dir
+     */
+    public static String getImgDir(String wxId) {
+        // 获得工作目录
+        String userDir = System.getProperty("user.dir");
+        // 文件分隔符
+        String separator = FileSystems.getDefault().getSeparator();
+        // 拼接路径
+        return userDir + separator + DATA + separator + DB + separator + wxId + separator + IMG;
+    }
+
+    /**
+     * 获取图片文件夹地址与文件名
+     *
+     * @param wxId wxId
+     * @return dir
+     */
+    public static String getImgDirWithName(String wxId, String fileName) {
+        // 获得工作目录
+        String userDir = System.getProperty("user.dir");
+        // 文件分隔符
+        String separator = FileSystems.getDefault().getSeparator();
+        // 拼接路径
+        return userDir + separator + DATA + separator + DB + separator + wxId + separator + IMG + separator + fileName;
     }
 }

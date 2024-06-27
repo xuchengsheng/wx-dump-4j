@@ -2,6 +2,7 @@ package com.xcs.wx.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author xcs
@@ -9,6 +10,7 @@ import lombok.Data;
  **/
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BaseException extends RuntimeException {
 
     /**

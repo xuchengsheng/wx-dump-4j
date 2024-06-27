@@ -10,6 +10,12 @@ import com.xcs.wx.mapper.SqliteMasterMapper;
 import com.xcs.wx.repository.SqliteMasterRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * SQLite 数据库中的一个系统表 Repository 实现类
+ *
+ * @author xcs
+ * @date 2024年6月13日09:19:24
+ */
 @Repository
 @DS(value = DataSourceType.MICRO_MSG_DB)
 public class SqliteMasterRepositoryImpl extends ServiceImpl<SqliteMasterMapper, SqliteMaster> implements SqliteMasterRepository {

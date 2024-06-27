@@ -6,7 +6,7 @@ import com.xcs.wx.domain.dto.RecoverContactDTO;
 import java.util.List;
 
 /**
- * FTSContactContentRepository
+ * 联系人内容 Repository
  *
  * @author xcs
  * @date 2024年6月14日15:18:11

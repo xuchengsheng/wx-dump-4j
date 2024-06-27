@@ -8,5 +8,11 @@ package com.xcs.wx.service;
  */
 public interface ContactHeadImgService {
 
+    /**
+     * 头像
+     *
+     * @param userName 用户名
+     * @return 头像字节
+     */
     byte[] avatar(String userName);
 }

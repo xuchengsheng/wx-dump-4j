@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * FeedsMediaVO
+ *
  * @author xcs
  * @date 2024年01月04日 14时25分
  **/

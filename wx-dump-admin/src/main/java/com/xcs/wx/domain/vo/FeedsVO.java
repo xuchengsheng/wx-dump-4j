@@ -6,6 +6,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * FeedsVO
+ *
  * @author xcs
  * @date 2024年01月03日 16时41分
  **/

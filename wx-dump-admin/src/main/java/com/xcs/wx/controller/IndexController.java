@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * 前端页面跳转
+ *
  * @author xcs
  * @date 2024年01月26日 11时34分
  **/
@@ -12,12 +14,11 @@ public class IndexController {
 
     /**
      * 配置url通配符，拦截多个地址
-     * @return
+     *
+     * @return html
      */
     @RequestMapping(value = {
-            "/",
-            "/wechat",
-            "/wechat/**",
+            "/"
     })
     public String index() {
         return "index";

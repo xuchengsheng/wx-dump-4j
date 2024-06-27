@@ -7,6 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
+ * Pbkdf2Hmac算法工具类
+ *
  * @author xcs
  * @date 2023年12月25日 09时35分
  **/

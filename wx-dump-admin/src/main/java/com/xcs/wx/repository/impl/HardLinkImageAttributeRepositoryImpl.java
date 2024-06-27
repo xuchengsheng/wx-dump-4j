@@ -9,8 +9,10 @@ import com.xcs.wx.repository.HardLinkImageAttributeRepository;
 import org.springframework.stereotype.Repository;
 
 /**
+ * 图片链接 Repository 实现类
+ *
  * @author xcs
- * @date 2024年01月04日 17时59分
+ * @date 2024年01月03日 16时56分
  **/
 @Repository
 @DS(value = DataSourceType.HARD_LINK_IMAGE_DB)

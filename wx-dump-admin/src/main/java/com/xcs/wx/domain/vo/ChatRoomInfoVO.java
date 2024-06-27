@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * ChatRoomInfoVO
+ *
  * @author xcs
  * @date 2024年01月09日 15时27分
  **/

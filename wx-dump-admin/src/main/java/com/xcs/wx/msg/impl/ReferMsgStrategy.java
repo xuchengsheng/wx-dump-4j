@@ -1,13 +1,13 @@
 package com.xcs.wx.msg.impl;
 
 import cn.hutool.core.lang.Opt;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.xcs.wx.domain.bo.CompressContentBO;
 import com.xcs.wx.domain.vo.MsgVO;
 import com.xcs.wx.msg.MsgStrategy;
 import com.xcs.wx.util.LZ4Util;
 import com.xcs.wx.util.XmlUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
  * @author xcs
  * @date 2024年01月24日 13时53分
  **/
+@Slf4j
 @Service
 public class ReferMsgStrategy implements MsgStrategy {
 
@@ -45,30 +46,30 @@ public class ReferMsgStrategy implements MsgStrategy {
                 .map(CompressContentBO.AppMsg::getReferMsg)
                 .ifPresent(referMsg -> {
                     try {
-                        String content = null;
+                        String refContent;
                         if (referMsg.getType() == 49) {
-                            CompressContentBO refCompressContentBO = XmlUtil.parseXml(referMsg.getContent(), CompressContentBO.class);
-                            // 空校验
-                            if (ObjUtil.isNotEmpty(refCompressContentBO) && ObjUtil.isNotEmpty(refCompressContentBO.getAppMsg())) {
-                                content = refCompressContentBO.getAppMsg().getTitle();
-                            }
+                            refContent = Opt.ofNullable(referMsg.getContent())
+                                    .map(content -> XmlUtil.parseXml(referMsg.getContent(), CompressContentBO.class))
+                                    .map(CompressContentBO::getAppMsg)
+                                    .map(CompressContentBO.AppMsg::getTitle)
+                                    .orElse(null);
                         } else if (referMsg.getType() == 47) {
-                            content = "[动画表情]";
+                            refContent = "[动画表情]";
                         } else if (referMsg.getType() == 3) {
-                            content = "[图片]";
+                            refContent = "[图片]";
                         } else if (referMsg.getType() == 34) {
-                            content = "[语音]";
+                            refContent = "[语音]";
                         } else if (referMsg.getType() == 43) {
-                            content = "[视频]";
+                            refContent = "[视频]";
                         } else {
-                            content = referMsg.getContent();
+                            refContent = referMsg.getContent();
                         }
-                        if (StrUtil.isEmpty(content)) {
-                            content = "None";
+                        if (StrUtil.isEmpty(refContent)) {
+                            refContent = "None";
                         }
-                        msgVO.setReferMsgContent(referMsg.getDisplayName() + "：" + content.replace("�", ""));
+                        msgVO.setReferMsgContent(referMsg.getDisplayName() + "：" + refContent.replace("�", ""));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("handle refer msg fail" ,e);
                     }
                 });
     }

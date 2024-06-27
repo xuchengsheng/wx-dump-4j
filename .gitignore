@@ -6,6 +6,7 @@ target/
 /img/
 /export/
 /config/
+/data/
 
 ### IntelliJ IDEA ###
 .idea
@@ -28,7 +29,6 @@ npm-debug.log*
 yarn-error.log
 
 /coverage
-.idea
 yarn.lock
 package-lock.json
 *bak
@@ -52,4 +52,3 @@ screenshot
 .eslintcache
 build
 
-/data

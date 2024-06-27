@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * ContactVO
+ *
  * @author xcs
  * @date 2023年12月22日 14时43分
  **/

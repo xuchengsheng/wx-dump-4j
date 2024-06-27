@@ -1,10 +1,9 @@
 package com.xcs.wx.service.impl;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.xcs.wx.constant.DataSourceType;
-import com.xcs.wx.domain.bo.UserVO;
+import com.xcs.wx.domain.vo.UserVO;
 import com.xcs.wx.repository.ContactHeadImgUrlRepository;
 import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.service.UserService;
@@ -39,15 +38,7 @@ public class UserServiceImpl implements UserService {
         if (wxId == null) {
             return null;
         }
-        String avatar = getAvatar(wxId);
-        return avatar;
-    }
-
-    private String getAvatar(String wxId) {
-        DynamicDataSourceContextHolder.push(wxId + "#" + DataSourceType.MICRO_MSG_DB);
-        String avatar = contactHeadImgUrlRepository.queryHeadImgUrlByUserName(wxId);
-        DynamicDataSourceContextHolder.clear();
-        return avatar;
+        return getAvatar(wxId);
     }
 
     @Override
@@ -58,13 +49,6 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return getNickName(wxId);
-    }
-
-    private String getNickName(String wxId) {
-        DynamicDataSourceContextHolder.push(wxId + "#" + DataSourceType.MICRO_MSG_DB);
-        String nickName = contactRepository.getNickName(wxId);
-        DynamicDataSourceContextHolder.clear();
-        return nickName;
     }
 
     @Override
@@ -162,5 +146,31 @@ public class UserServiceImpl implements UserService {
             log.error("allUser error", e);
         }
         return userVOList;
+    }
+
+    /**
+     * 根据wxId获取头像
+     *
+     * @param wxId wxId
+     * @return 头像
+     */
+    private String getAvatar(String wxId) {
+        DynamicDataSourceContextHolder.push(wxId + "#" + DataSourceType.MICRO_MSG_DB);
+        String avatar = contactHeadImgUrlRepository.queryHeadImgUrlByUserName(wxId);
+        DynamicDataSourceContextHolder.clear();
+        return avatar;
+    }
+
+    /**
+     * 根据wxId获取昵称
+     *
+     * @param wxId wxId
+     * @return 昵称
+     */
+    private String getNickName(String wxId) {
+        DynamicDataSourceContextHolder.push(wxId + "#" + DataSourceType.MICRO_MSG_DB);
+        String nickName = contactRepository.getNickName(wxId);
+        DynamicDataSourceContextHolder.clear();
+        return nickName;
     }
 }

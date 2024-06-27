@@ -7,6 +7,8 @@ import com.alibaba.excel.enums.poi.HorizontalAlignmentEnum;
 import lombok.Data;
 
 /**
+ * ExportMsgVO
+ *
  * @author xcs
  * @date 2024年01月25日 16时16分
  **/

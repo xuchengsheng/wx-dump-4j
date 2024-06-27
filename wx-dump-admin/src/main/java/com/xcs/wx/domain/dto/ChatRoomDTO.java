@@ -1,13 +1,17 @@
 package com.xcs.wx.domain.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
+ * ChatRoomDTO
+ *
  * @author xcs
  * @date 2024年01月08日 16时24分
  **/
 @Data
-public class ChatRoomDTO extends PageDTO{
+@EqualsAndHashCode(callSuper = true)
+public class ChatRoomDTO extends PageDTO {
 
     /**
      * 群聊标题

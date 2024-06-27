@@ -2,7 +2,7 @@ import { queryFeeds } from '@/services/Feeds';
 import { queryAllContact } from '@/services/Contact';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { PageContainer, ProList } from '@ant-design/pro-components';
-import { Avatar, Col, Flex, Image, Row, Typography } from 'antd';
+import { Avatar, Col, Flex, Image, Row, Typography,Alert } from 'antd';
 import React from 'react';
 import './Style/Feeds.less';
 import { useEffect, useState } from 'react';
@@ -41,6 +41,14 @@ const Feeds: React.FC = () => {
 
   return (
     <PageContainer>
+      <Alert
+        message="温馨提示"
+        description="从2024年4月24日开始，微信朋友圈的图片暂时无法显示。经过我们的初步分析，猜测这可能是由于某些限制导致的。不过，请放心，2024年4月24日之前发布的图片依然可以正常显示，不受影响。"
+        type="warning"
+        style={{marginBottom:10}}
+        showIcon
+        closable
+      />
       <ProList<FeedsItem>
         request={async (params) => {
           try {
@@ -112,6 +120,7 @@ const Feeds: React.FC = () => {
                           <Image
                             width={150}
                             height={150}
+                            fallback="/img/404.png"
                             src={`/api/image/downloadImg?path=${encodeURIComponent(media.url)}`}
                             style={{ objectFit: 'cover' }}
                           />

@@ -14,8 +14,8 @@ public class DateFormatUtil {
     /**
      * 格式化时间戳
      *
-     * @param timestampInSeconds
-     * @return
+     * @param timestampInSeconds 时间戳（以秒为单位）
+     * @return 格式化后的时间字符串
      */
     public static String formatTimestamp(long timestampInSeconds) {
         // 将秒转换为毫秒

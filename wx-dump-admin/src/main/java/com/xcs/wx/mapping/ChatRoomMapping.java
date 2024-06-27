@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * 群聊 Mapping
+ *
  * @author xcs
  * @date 2024年01月08日 17时00分
  **/

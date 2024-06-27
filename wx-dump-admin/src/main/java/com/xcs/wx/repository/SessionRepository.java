@@ -5,7 +5,7 @@ import com.xcs.wx.domain.vo.SessionVO;
 import java.util.List;
 
 /**
- * 会话Repository
+ * 会话 Repository
  *
  * @author xcs
  * @date 2023年12月21日17:33:19

@@ -9,8 +9,10 @@ import com.xcs.wx.repository.HardLinkVideoAttributeRepository;
 import org.springframework.stereotype.Repository;
 
 /**
+ * 视频链接 Repository 实现类
+ *
  * @author xcs
- * @date 2024年02月07日 15时27分
+ * @date 2024年01月03日 16时56分
  **/
 @Repository
 @DS(value = DataSourceType.HARD_LINK_VIDEO_DB)

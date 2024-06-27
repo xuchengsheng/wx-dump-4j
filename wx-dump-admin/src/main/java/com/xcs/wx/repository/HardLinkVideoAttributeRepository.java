@@ -1,6 +1,8 @@
 package com.xcs.wx.repository;
 
 /**
+ * 视频链接 Repository
+ *
  * @author xcs
  * @date 2024年01月03日 16时56分
  **/

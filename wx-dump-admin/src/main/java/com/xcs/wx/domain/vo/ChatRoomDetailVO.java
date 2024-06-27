@@ -6,6 +6,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * ChatRoomDetailVO
+ *
  * @author xcs
  * @date 2024年01月08日 16时10分
  **/

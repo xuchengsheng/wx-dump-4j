@@ -5,6 +5,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * xml解析工具类
+ *
  * @author xcs
  * @date 2024年01月24日 14时14分
  **/
@@ -13,7 +15,8 @@ public class XmlUtil {
 
     private static final XmlMapper MAPPER = new XmlMapper();
 
-    private XmlUtil(){}
+    private XmlUtil() {
+    }
 
     /**
      * 解析 XML
@@ -31,7 +34,7 @@ public class XmlUtil {
             }
             return MAPPER.readValue(content, valueType);
         } catch (JsonProcessingException e) {
-            log.error("Parsing XML failed", e);
+            log.error("parse xml failed", e);
         }
         return null;
     }

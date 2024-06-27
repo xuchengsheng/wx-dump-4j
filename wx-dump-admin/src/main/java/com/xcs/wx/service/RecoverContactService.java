@@ -6,7 +6,7 @@ import com.xcs.wx.domain.vo.RecoverContactVO;
 import java.util.List;
 
 /**
- * RecoverContactService
+ * 找回联系人服务
  *
  * @author xcs
  * @date 2024年6月14日15:28:11

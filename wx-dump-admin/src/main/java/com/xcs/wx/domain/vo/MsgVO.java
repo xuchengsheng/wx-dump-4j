@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
+ * MsgVO
+ *
  * @author xcs
  * @date 2023年12月22日 14时43分
  **/

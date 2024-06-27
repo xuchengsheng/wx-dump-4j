@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * CountRecentMsgsVO
+ *
  * @author xcs
  * @date 2024年01月06日 14时21分
  **/

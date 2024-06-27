@@ -5,12 +5,15 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.xcs.wx.service.UserService;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * 数据源类型枚举
+ *
  * @author xcs
  * @date 2023年12月25日 16时41分
  **/
@@ -59,7 +62,12 @@ public class DataSourceType {
      * @return 数据库名称
      */
     public static List<String> getMsgDb() {
-        return getDb(SpringUtil.getBean(UserService.class).currentUser() + "#" + "MSG.*\\.db");
+        String wxId = SpringUtil.getBean(UserService.class).currentUser();
+        // 空校验
+        if (wxId == null) {
+            return Collections.emptyList();
+        }
+        return getDb(wxId + "#" + "MSG.*\\.db");
     }
 
     /**

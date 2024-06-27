@@ -18,8 +18,8 @@ public interface FeedsMapping {
     /**
      * 转换参数
      *
-     * @param feeds
-     * @return
+     * @param feeds 请求参数
+     * @return FeedsVO
      */
     List<FeedsVO> convert(List<Feeds> feeds);
 }

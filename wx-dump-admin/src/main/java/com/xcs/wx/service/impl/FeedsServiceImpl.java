@@ -14,6 +14,7 @@ import com.xcs.wx.repository.*;
 import com.xcs.wx.service.FeedsService;
 import com.xcs.wx.util.XmlUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,9 +24,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * 朋友圈服务实现
+ *
  * @author xcs
- * @date 2024年01月03日 17时25分
- **/
+ * @date 2024年1月3日17:25:26
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedsServiceImpl implements FeedsService {
@@ -150,7 +154,7 @@ public class FeedsServiceImpl implements FeedsService {
             xml = xml.replace("&#x02;", "");
             return XmlUtil.parseXml(xml, TimelineObjectBO.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("parse xml to obj fail", e);
         }
         return null;
     }

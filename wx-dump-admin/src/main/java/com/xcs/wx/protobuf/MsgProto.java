@@ -1,7 +1,14 @@
 package com.xcs.wx.protobuf;
 
+/**
+ * 消息 Protobuf
+ *
+ * @author xcs
+ * @date 2024年6月27日14:55:41
+ */
 @SuppressWarnings("all")
 public final class MsgProto {
+    
     private MsgProto() {
     }
 

@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * RecoverContactService 实现类
+ * 找回联系人服务 实现类
  *
  * @author xcs
  * @date 2024年6月14日15:32:10

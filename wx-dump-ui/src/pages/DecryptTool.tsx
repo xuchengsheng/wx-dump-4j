@@ -26,6 +26,9 @@ const DecryptTool: React.FC = () => {
       basePath: record.basePath,
       wxId: record.wxId,
       nickname: record.nickname,
+      version: record.version,
+      account: record.account,
+      mobile: record.mobile,
     }).toString();
 
     const eventSource = new EventSource(`/api/database/decrypt?${params}`);
@@ -49,6 +52,11 @@ const DecryptTool: React.FC = () => {
       setDecryptingIds((prev) => ({ ...prev, [record.pid]: false }));
     };
   };
+
+
+  const handleDetail = (record: WeChat) => {
+    
+  }
 
   const columns: ProColumns<WeChat>[] = [
     {
@@ -133,7 +141,7 @@ const DecryptTool: React.FC = () => {
             {decryptingIds[record.pid] ? '解密中' : '开始解密'}
           </Button>
           <Divider type="vertical" />
-          <Button size="small" type="link" onClick={() => handleDecrypt(record)}>
+          <Button size="small" type="link" onClick={() => handleDetail(record)}>
             查看详情
           </Button>
         </Flex>

@@ -8,7 +8,10 @@ import org.apache.ibatis.type.ByteArrayTypeHandler;
 
 /**
  * 联系人头像表实体类
- */
+ *
+ * @author xcs
+ * @date 2023年12月22日 10时59分
+ **/
 @Data
 @TableName("ContactHeadImg1")
 public class ContactHeadImg {

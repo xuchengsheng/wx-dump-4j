@@ -15,11 +15,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * 群聊实现类 Repository
+ * 群聊 Repository 实现类
  *
  * @author xcs
- * @date 2024年01月08日 16时00分
- **/
+ * @date 2023年12月21日18:38:19
+ */
 @Repository
 @DS(value = DataSourceType.MICRO_MSG_DB)
 public class ChatRoomRepositoryImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> implements ChatRoomRepository {

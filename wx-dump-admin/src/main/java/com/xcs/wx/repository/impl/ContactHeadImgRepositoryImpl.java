@@ -9,7 +9,7 @@ import com.xcs.wx.repository.ContactHeadImgRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * 联系人头像 Repository实现类
+ * 联系人头像 Repository 实现类
  *
  * @author xcs
  * @date 2024年6月18日15:31:54

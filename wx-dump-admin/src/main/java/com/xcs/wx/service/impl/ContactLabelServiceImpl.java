@@ -11,6 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 联系人表情服务实现
+ *
+ * @author xcs
+ * @date 2023年12月31日18:18:58
+ */
 @Service
 @RequiredArgsConstructor
 public class ContactLabelServiceImpl implements ContactLabelService {
@@ -20,11 +26,8 @@ public class ContactLabelServiceImpl implements ContactLabelService {
 
     @Override
     public List<ContactLabelVO> queryContactLabel() {
-        // 查询标签
         return Optional.ofNullable(contactLabelRepository.queryContactLabelAsList())
-                // 转换参数
-                .map(labels -> contactLabelMapping.convert(labels))
-                // 设置默认值
+                .map(contactLabelMapping::convert)
                 .orElse(Collections.emptyList());
     }
 }

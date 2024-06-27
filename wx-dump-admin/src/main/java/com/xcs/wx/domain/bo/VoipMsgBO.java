@@ -7,6 +7,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
 /**
+ * VoipMsgBO
+ *
  * @author xcs
  * @date 2024年01月17日 15时15分
  **/

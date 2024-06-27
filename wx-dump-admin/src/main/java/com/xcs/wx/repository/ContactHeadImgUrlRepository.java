@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 联系人头像
+ * 联系人头像 Repository
  *
  * @author xcs
  * @date 2023年12月21日18:38:19

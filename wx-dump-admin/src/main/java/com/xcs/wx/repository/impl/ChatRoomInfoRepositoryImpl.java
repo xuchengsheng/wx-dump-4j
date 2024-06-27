@@ -9,9 +9,11 @@ import com.xcs.wx.repository.ChatRoomInfoRepository;
 import org.springframework.stereotype.Repository;
 
 /**
+ * 群聊详情 Repository 实现类
+ *
  * @author xcs
- * @date 2024年01月09日 15时02分
- **/
+ * @date 2023年12月21日18:38:19
+ */
 @Repository
 @DS(value = DataSourceType.MICRO_MSG_DB)
 public class ChatRoomInfoRepositoryImpl extends ServiceImpl<ChatRoomInfoMapper, ChatRoomInfo> implements ChatRoomInfoRepository {

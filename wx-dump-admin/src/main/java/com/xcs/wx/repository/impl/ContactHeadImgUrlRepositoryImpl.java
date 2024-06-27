@@ -1,7 +1,6 @@
 package com.xcs.wx.repository.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,21 +17,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * 联系人头像 Repository 实现类
+ *
  * @author xcs
- * @date 2023年12月21日 18时35分
- **/
+ * @date 2023年12月21日18:38:19
+ */
 @Repository
 @DS(value = DataSourceType.MICRO_MSG_DB)
-public class ContactHeadImgUrlRepositoryImpl extends ServiceImpl<ContactHeadImgUrlMapper, ContactHeadImgUrl>
-        implements ContactHeadImgUrlRepository {
+public class ContactHeadImgUrlRepositoryImpl extends ServiceImpl<ContactHeadImgUrlMapper, ContactHeadImgUrl> implements ContactHeadImgUrlRepository {
 
     @Override
     public Map<String, String> queryHeadImgUrl(List<String> usrNames) {
-        // 构建查询条件
         Wrapper<ContactHeadImgUrl> wrapper = Wrappers.<ContactHeadImgUrl>lambdaQuery()
                 .select(ContactHeadImgUrl::getUsrName, ContactHeadImgUrl::getSmallHeadImgUrl)
                 .in(ContactHeadImgUrl::getUsrName, usrNames);
-        // 返回头像并转换成map
         return Optional.ofNullable(super.list(wrapper))
                 .map(headImgUrls -> headImgUrls.stream().collect(Collectors.toMap(ContactHeadImgUrl::getUsrName, ContactHeadImgUrl::getSmallHeadImgUrl)))
                 .orElse(Collections.emptyMap());
@@ -43,9 +41,8 @@ public class ContactHeadImgUrlRepositoryImpl extends ServiceImpl<ContactHeadImgU
         Wrapper<ContactHeadImgUrl> wrapper = Wrappers.<ContactHeadImgUrl>lambdaQuery()
                 .select(ContactHeadImgUrl::getUsrName, ContactHeadImgUrl::getSmallHeadImgUrl)
                 .eq(ContactHeadImgUrl::getUsrName, userName);
-        String smallHeadImgUrl = Optional.ofNullable(super.getOne(wrapper))
+        return Optional.ofNullable(super.getOne(wrapper))
                 .map(ContactHeadImgUrl::getSmallHeadImgUrl)
                 .orElse(null);
-        return smallHeadImgUrl;
     }
 }

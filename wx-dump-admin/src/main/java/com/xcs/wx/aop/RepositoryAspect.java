@@ -11,6 +11,12 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+/**
+ * 多微信数据源动态切换拦截
+ *
+ * @author xcs
+ * @date 2024年6月27日14:29:32
+ */
 @Slf4j
 @Aspect
 @Component

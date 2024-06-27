@@ -3,7 +3,7 @@ package com.xcs.wx.repository;
 import com.xcs.wx.domain.ChatRoomInfo;
 
 /**
- * 群聊信息 Repository
+ * 群聊详情 Repository
  *
  * @author xcs
  * @date 2023年12月21日18:38:19

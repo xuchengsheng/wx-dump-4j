@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * MsgTypeDistributionVO
+ *
  * @author xcs
  * @date 2024年01月05日 15时25分
  **/

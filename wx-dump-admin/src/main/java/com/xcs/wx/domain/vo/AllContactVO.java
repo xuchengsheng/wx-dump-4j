@@ -3,6 +3,8 @@ package com.xcs.wx.domain.vo;
 import lombok.Data;
 
 /**
+ * AllContactVO
+ *
  * @author xcs
  * @date 2024年02月07日 11时15分
  **/

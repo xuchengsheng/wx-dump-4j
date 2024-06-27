@@ -1,6 +1,6 @@
 package com.xcs.wx.service;
 
-import com.xcs.wx.domain.bo.UserVO;
+import com.xcs.wx.domain.vo.UserVO;
 
 import java.util.List;
 

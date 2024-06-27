@@ -5,6 +5,8 @@ import com.xcs.wx.domain.Feeds;
 import com.xcs.wx.domain.dto.FeedsDTO;
 
 /**
+ * 朋友圈 Repository
+ *
  * @author xcs
  * @date 2024年01月03日 16时56分
  **/

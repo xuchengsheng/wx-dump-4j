@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
+ * 群聊 Mapper
+ *
  * @author xcs
  * @date 2024年01月08日 15时55分
  **/
