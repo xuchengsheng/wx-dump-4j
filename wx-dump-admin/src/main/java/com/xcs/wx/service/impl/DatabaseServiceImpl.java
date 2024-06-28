@@ -7,17 +7,19 @@ import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
 import com.baomidou.dynamic.datasource.creator.druid.DruidConfig;
-import com.xcs.wx.constant.DataSourceType;
 import com.xcs.wx.constant.SqliteConstant;
 import com.xcs.wx.domain.bo.DecryptBO;
+import com.xcs.wx.domain.bo.UserBO;
 import com.xcs.wx.domain.dto.DecryptDTO;
+import com.xcs.wx.domain.vo.DatabaseVO;
 import com.xcs.wx.domain.vo.DecryptVO;
 import com.xcs.wx.domain.vo.ResponseVO;
-import com.xcs.wx.exception.BizException;
 import com.xcs.wx.service.DatabaseService;
 import com.xcs.wx.service.DecryptService;
 import com.xcs.wx.service.UserService;
 import com.xcs.wx.service.WeChatService;
+import com.xcs.wx.util.DSNameUtil;
+import com.xcs.wx.util.DirUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -33,6 +35,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,12 +65,19 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
         String key = weChatService.getKey(decryptDTO.getPid(), dbPath);
         // 获取微信秘钥失败
         if (StrUtil.isBlank(key)) {
-            throw new BizException(-1, "获取微信秘钥失败，请稍后再试。");
+            try {
+                emitter.send(ResponseVO.error(-1, "获取微信秘钥失败，请稍后再试。"), MediaType.APPLICATION_JSON);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                emitter.complete();
+            }
+            return;
         }
         // 扫描目录
         String scanPath = dbPath + separator + "MSG";
         // 输出目录
-        String outputPath = System.getProperty("user.dir") + separator + "data" + separator + "db" + separator + decryptDTO.getWxId() + separator;
+        String outputPath = DirUtil.getDbDir(decryptDTO.getWxId());
         // 使用Files.walk创建一个Stream来遍历给定路径下的所有文件和目录
         try (Stream<Path> stream = Files.walk(Paths.get(scanPath))) {
             // 过滤出非目录的文件
@@ -80,23 +90,58 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
                 // 当前要处理的文件
                 File currentFile = new File(decryptBO.getInput());
                 // 响应给前端的对象
-                DecryptVO decryptVO = DecryptVO.builder().fileName(FileUtil.getName(currentFile)).fileSize(FileUtil.readableFileSize(currentFile)).total(decryptBOList.size()).currentProgress(currentProgress).build();
+                DecryptVO decryptVO = DecryptVO.builder()
+                        .fileName(FileUtil.getName(currentFile))
+                        .fileSize(FileUtil.readableFileSize(currentFile))
+                        .total(decryptBOList.size())
+                        .currentProgress(currentProgress)
+                        .build();
                 try {
                     emitter.send(ResponseVO.ok(decryptVO), MediaType.APPLICATION_JSON);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException ignore) {
                 }
                 // 解密
                 decryptService.wechatDecrypt(key, decryptBO);
                 // 注册数据源
                 registerDataSource(decryptBO.getOutput());
             }
-            userService.saveBasePath(decryptDTO.getWxId(), decryptDTO.getBasePath());
+            // 保存用户
+            userService.saveUser(UserBO.builder()
+                    .basePath(decryptDTO.getBasePath())
+                    .account(decryptDTO.getAccount())
+                    .mobile(decryptDTO.getMobile())
+                    .version(decryptDTO.getVersion())
+                    .nickname(decryptDTO.getNickname())
+                    .wxId(decryptDTO.getWxId())
+                    .build());
         } catch (Exception e) {
             log.error("Sqlite database decryption failed", e);
         } finally {
             emitter.complete();
         }
+    }
+
+    @Override
+    public List<DatabaseVO> getDatabase(String wxId) {
+        String dbPath = DirUtil.getDbDir(wxId);
+        // 不存在目录直接返回
+        if (!FileUtil.exist(dbPath)) {
+            return Collections.emptyList();
+        }
+        // 使用Files.walk创建一个Stream来遍历给定路径下的所有文件和目录
+        try (Stream<Path> stream = Files.walk(Paths.get(dbPath))) {
+            return stream.filter(file -> file.toString().endsWith(".db"))
+                    .map(file -> {
+                        DatabaseVO databaseVO = new DatabaseVO();
+                        databaseVO.setFilePath(file.toString());
+                        databaseVO.setFileSize(FileUtil.readableFileSize(file.toFile()));
+                        return databaseVO;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("get database failed", e);
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -110,24 +155,6 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
         return stream.filter(file -> !Files.isDirectory(file))
                 // 过滤出文件名以.db结尾的文件
                 .filter(file -> file.toString().endsWith(".db"))
-                // 过滤指定的数据库文件
-                .filter(file -> {
-                    String filePath = file.toString();
-                    // 聊天记录数据库
-                    return filePath.matches(".*\\\\MSG\\d+\\.db") ||
-                            // 联系人
-                            filePath.endsWith(DataSourceType.MICRO_MSG_DB) ||
-                            // 朋友圈
-                            filePath.endsWith(DataSourceType.SNS_DB) ||
-                            // 索引联系人
-                            filePath.endsWith(DataSourceType.FTS_CONTACT_DB) ||
-                            // 图片
-                            filePath.endsWith(DataSourceType.HARD_LINK_IMAGE_DB) ||
-                            // 头像
-                            filePath.endsWith(DataSourceType.MISC_DB) ||
-                            // 视频
-                            filePath.endsWith(DataSourceType.HARD_LINK_VIDEO_DB);
-                })
                 // 将每个符合条件的文件路径映射为DecryptDTO对象
                 .map(item -> new DecryptBO(item.toString(), outputPath + FileUtil.getName(item.toString())))
                 // 转换成List
@@ -136,10 +163,8 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        // 文件分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 获取当前工作目录下的 db 目录
-        String dbPath = System.getProperty("user.dir") + separator + "data" + separator + "db";
+        String dbPath = DirUtil.getDbDir();
         // 获得目录
         Path dbDirectory = Paths.get(dbPath);
         // 检查目录是否存在
@@ -180,7 +205,7 @@ public class DatabaseServiceImpl implements DatabaseService, ApplicationRunner {
         DataSourceProperty sourceProperty = new DataSourceProperty();
         sourceProperty.setUrl(SqliteConstant.URL_PREFIX + dbPath);
         sourceProperty.setDriverClassName(SqliteConstant.DRIVER_CLASS_NAME);
-        sourceProperty.setPoolName(wxId + "#" + dbName);
+        sourceProperty.setPoolName(DSNameUtil.getDSName(wxId, dbName));
         DynamicRoutingDataSource dynamicRoutingDataSource = SpringUtil.getBean(DynamicRoutingDataSource.class);
         DefaultDataSourceCreator dataSourceCreator = SpringUtil.getBean(DefaultDataSourceCreator.class);
         DataSource dataSource = dataSourceCreator.createDataSource(sourceProperty);

@@ -1,14 +1,33 @@
-import { queryWeChat } from '@/services/DataBase';
-import type { ProColumns } from '@ant-design/pro-components';
+import { readWeChatConfig } from '@/services/User';
+import { getDatabase } from '@/services/DataBase';
+
+import type { ProColumns,ActionType } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Flex, Modal, Progress, Result, message, Divider } from 'antd';
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 
 const DecryptTool: React.FC = () => {
   const [decryptProgress, setDecryptProgress] = useState<{ [key: number]: number }>({});
   const [isDecryptModalOpen, setIsDecryptModalOpen] = useState(false);
   const [decryptingIds, setDecryptingIds] = useState<{ [key: number]: boolean }>({});
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [wxId, setWxId] = useState<string>();
+  const ref = useRef<ActionType>();
+
+  const handleDetail = (record: WeChatConfig) => {
+    setIsDetailModalOpen(true);
+    setWxId(record.wxId);
+    ref.current?.reload();
+  }
+
+  const handleDetailOk = () => {
+    setIsDetailModalOpen(false);
+  };
+
+  const handleDetailCancel = () => {
+    setIsDetailModalOpen(false);
+  };
 
   const handleDecryptOk = () => {
     setIsDecryptModalOpen(false);
@@ -18,7 +37,7 @@ const DecryptTool: React.FC = () => {
     setIsDecryptModalOpen(false);
   };
 
-  const handleDecrypt = (record: WeChat) => {
+  const handleDecrypt = (record: WeChatConfig) => {
     setDecryptingIds((prev) => ({ ...prev, [record.pid]: true }));
 
     const params = new URLSearchParams({
@@ -53,12 +72,22 @@ const DecryptTool: React.FC = () => {
     };
   };
 
+  const columnsDetail: ProColumns<DatabaseItem>[] = [
+    {
+      title: '文件地址',
+      dataIndex: 'filePath',
+      align: 'start',
+      search: false,
+    },
+    {
+      dataIndex: 'fileSize',
+      title: '文件大小',
+      search: false,
+      align: 'start',
+    },
+  ];
 
-  const handleDetail = (record: WeChat) => {
-    
-  }
-
-  const columns: ProColumns<WeChat>[] = [
+  const columns: ProColumns<WeChatConfig>[] = [
     {
       title: '进程ID',
       dataIndex: 'pid',
@@ -138,11 +167,11 @@ const DecryptTool: React.FC = () => {
             onClick={() => handleDecrypt(record)}
             disabled={decryptingIds[record.pid]}
           >
-            {decryptingIds[record.pid] ? '解密中' : '开始解密'}
+            {decryptingIds[record.pid] ? '解密中' : '解密'}
           </Button>
           <Divider type="vertical" />
           <Button size="small" type="link" onClick={() => handleDetail(record)}>
-            查看详情
+            详情
           </Button>
         </Flex>
       ),
@@ -151,16 +180,16 @@ const DecryptTool: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<WeChat>
+      <ProTable<WeChatConfig>
         columns={columns}
         search={false}
         cardBordered={{
           search: true,
           table: true,
         }}
-        request={async (params) => {
+        request={async () => {
           try {
-            return queryWeChat();
+            return readWeChatConfig();
           } catch (error) {
             console.error(error);
             return [];
@@ -185,6 +214,31 @@ const DecryptTool: React.FC = () => {
               关闭
             </Button>,
           ]}
+        />
+      </Modal>
+
+      <Modal open={isDetailModalOpen} onOk={handleDetailOk} onCancel={handleDetailCancel} width={1000} footer={null}>
+        <ProTable<DatabaseItem>
+          columns={columnsDetail}
+          search={false}
+          actionRef={ref}
+          cardBordered={{
+            search: true,
+            table: true,
+          }}
+          request={async () => {
+            try {
+              return getDatabase({wxId:wxId});
+            } catch (error) {
+              console.error(error);
+              return [];
+            }
+          }}
+          revalidateOnFocus={false}
+          rowKey="filePath"
+          options={false}
+          pagination={false}
+          headerTitle="数据库列表"
         />
       </Modal>
     </PageContainer>

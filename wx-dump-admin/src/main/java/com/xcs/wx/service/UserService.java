@@ -1,5 +1,7 @@
 package com.xcs.wx.service;
 
+import com.xcs.wx.domain.bo.UserBO;
+import com.xcs.wx.domain.vo.UserInfoVO;
 import com.xcs.wx.domain.vo.UserVO;
 
 import java.util.List;
@@ -11,6 +13,13 @@ import java.util.List;
  * @date 2023年12月21日 17时16分
  **/
 public interface UserService {
+
+    /**
+     * 用户信息
+     *
+     * @return 用户信息
+     */
+    UserInfoVO userInfo();
 
     /**
      * 用户头像
@@ -31,7 +40,7 @@ public interface UserService {
      *
      * @return wxIds
      */
-    List<UserVO> allUser();
+    List<UserVO> users();
 
     /**
      * 切换用户
@@ -48,12 +57,11 @@ public interface UserService {
     String currentUser();
 
     /**
-     * 保存路径
+     * 保存用户
      *
-     * @param wxId     wxId
-     * @param basePath 路径
+     * @param userBO 用户信息
      */
-    void saveBasePath(String wxId, String basePath);
+    void saveUser(UserBO userBO);
 
     /**
      * 获取微信存储路径

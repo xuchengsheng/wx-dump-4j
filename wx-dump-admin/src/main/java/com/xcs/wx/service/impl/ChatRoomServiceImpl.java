@@ -5,7 +5,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.excel.EasyExcel;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xcs.wx.domain.ChatRoomInfo;
@@ -18,12 +17,12 @@ import com.xcs.wx.repository.ChatRoomRepository;
 import com.xcs.wx.repository.ContactHeadImgUrlRepository;
 import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.service.ChatRoomService;
+import com.xcs.wx.util.DirUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.FileSystems;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,12 +64,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                         if (!StrUtil.isBlank(chatRoom.getHeadImgUrl())) {
                             continue;
                         }
-                        // 获取spring上下文
-                        ApplicationContext context = SpringUtil.getApplicationContext();
-                        // 获取端口
-                        String port = context.getEnvironment().getProperty("server.port", "8080");
                         // 设置联系人头像路径
-                        chatRoom.setHeadImgUrl("http://localhost:" + port + "/api/contact/headImg/avatar?userName=" + chatRoom.getChatRoomName());
+                        chatRoom.setHeadImgUrl("/api/contact/headImg/avatar?userName=" + chatRoom.getChatRoomName());
                     }
                     return page;
                 })
@@ -98,16 +93,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public String exportChatRoom() {
-        // 分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
-        String filePath = System.getProperty("user.dir") + separator + "export";
+        String filePath = DirUtil.getExportDir("群聊.xlsx");
         // 创建文件
-        FileUtil.mkdir(filePath);
-        // 文件路径+文件名
-        String pathName = filePath + separator + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss") + "群聊" + ".xlsx";
+        FileUtil.mkdir(new File(filePath).getParent());
         // 导出
-        EasyExcel.write(pathName, ExportChatRoomVO.class)
+        EasyExcel.write(filePath, ExportChatRoomVO.class)
                 .sheet("sheet1")
                 .doWrite(() -> {
                     List<ExportChatRoomVO> exportChatRoomVOS = chatRoomRepository.exportChatRoom();
@@ -118,7 +109,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                     return exportChatRoomVOS;
                 });
         // 返回写入后的文件
-        return pathName;
+        return filePath;
     }
 
     /**

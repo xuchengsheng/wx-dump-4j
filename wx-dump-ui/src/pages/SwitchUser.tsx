@@ -1,8 +1,8 @@
 import { InfoCircleOutlined, UserSwitchOutlined } from '@ant-design/icons';
-import { Dropdown, Avatar, message } from 'antd';
+import { Dropdown, Avatar, message, Modal, Descriptions,Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { getAllUser, switchUser } from "@/services/User";
+import { getUsers, switchUser,getUserInfo } from "@/services/User";
 
 export type SwitchUserProps = {
   children?: React.ReactNode;
@@ -10,11 +10,23 @@ export type SwitchUserProps = {
 
 const SwitchUser: React.FC<SwitchUserProps> = ({ children }) => {
   const [users, setUsers] = useState<UserItem[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo>();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAllUser = async () => {
+  const { Text } = Typography;
+
+  const handleUserInfoOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleUserInfoCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleUsers = async () => {
     try {
-      const response = await getAllUser();
+      const response = await getUsers();
       if (response.success) {
         setUsers(response.data);
         const currentUser = response.data.find((user: UserItem) => user.current);
@@ -27,42 +39,43 @@ const SwitchUser: React.FC<SwitchUserProps> = ({ children }) => {
     }
   };
 
+  const handleUserInfo = async () => {
+    try {
+      const response = await getUserInfo();
+      if (response.success) {
+        setUserInfo(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    handleAllUser();
+    handleUsers();
   }, []);
 
   const onClick: MenuProps['onClick'] = async ({ key }) => {
     const selectKey = `${key}`;
-    const selectLabel = getLabelByKey(selectKey, menuItems);
 
-    if (selectKey == 'switch' || selectKey == 'userinfo') {
+    if (selectKey == 'switch') {
       return;
     }
+
+    if (selectKey == 'userInfo') {
+      setIsModalOpen(true);
+      handleUserInfo();
+      return;
+    }
+
     try {
       const response = await switchUser({ wxId: selectKey });
       if (response.success) {
-        message.success(`成功切换至用户 ${selectLabel}。`);
         window.location.reload();
       }
     } catch (error) {
       console.error(error);
-      message.error(`切换用户 ${selectLabel} 失败，请稍后重试。`);
+      message.error('切换用户失败，请稍后重试。');
     }
-  };
-
-  const getLabelByKey = (key: string, items: any[]): string | null => {
-    for (const item of items) {
-      if (item.key === key) {
-        return item.label;
-      }
-      if (item.children) {
-        const found = getLabelByKey(key, item.children);
-        if (found) {
-          return found;
-        }
-      }
-    }
-    return null;
   };
 
   const userMenuItems = users.map((user) => ({
@@ -84,16 +97,29 @@ const SwitchUser: React.FC<SwitchUserProps> = ({ children }) => {
       type: 'divider' as const,
     },
     {
-      key: 'userinfo',
+      key: 'userInfo',
       icon: <InfoCircleOutlined />,
-      label: '个人信息',
+      label: '账号信息',
     },
   ];
 
   return (
-    <Dropdown menu={{ selectedKeys, items: menuItems, onClick }}>
-      {children}
-    </Dropdown>
+    <>
+      <Dropdown menu={{ selectedKeys, items: menuItems, onClick }}>
+        {children}
+      </Dropdown>
+
+      <Modal open={isModalOpen} onOk={handleUserInfoOk} onCancel={handleUserInfoCancel} width={1000}>
+        <Descriptions title="账号信息">
+          <Descriptions.Item label="微信Id">{userInfo?.wxId}</Descriptions.Item>
+          <Descriptions.Item label="版本号">{userInfo?.version}</Descriptions.Item>
+          <Descriptions.Item label="文件目录"><Text ellipsis style={{width:200}}>{userInfo?.basePath}</Text></Descriptions.Item>
+          <Descriptions.Item label="昵称">{userInfo?.nickname}</Descriptions.Item>
+          <Descriptions.Item label="账号">{userInfo?.account}</Descriptions.Item>
+          <Descriptions.Item label="手机号">{userInfo?.mobile}</Descriptions.Item>
+        </Descriptions>
+      </Modal>
+    </>
   );
 };
 

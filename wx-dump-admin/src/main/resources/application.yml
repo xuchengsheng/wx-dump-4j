@@ -46,6 +46,10 @@ wechat-offset:
       nickname: 93550360
       account: 93550136
       mobile: 93550168
+    "[3.9.11.19]":
+      nickname: 93550296
+      account: 93550072
+      mobile: 93550104
 mybatis-plus:
   global-config:
     banner: off

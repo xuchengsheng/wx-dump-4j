@@ -1,5 +1,5 @@
 import { queryMsg } from '@/services/Msg';
-import { Avatar, Button, Card, Flex, Image, List, Spin, Typography } from 'antd';
+import { Avatar, Button, Card, Flex, Image, List, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import './Style/Chat.less';
 
@@ -101,18 +101,14 @@ const Chat: React.FC<ChatProps> = ({ userName }) => {
                                 destroyOnClose: true,
                               }}
                               fallback="/img/404.png"
-                              placeholder={
-                                <Flex justify="center">
-                                  <Spin size="small" />
-                                </Flex>
-                              }
+                              placeholder={true}
                             />
                           </Flex>
                         );
                       } else if (item.type === 47 && item.subType === 0) {
                         return (
                           <Image
-                            width={200}
+                            width={150}
                             src={`/api/image/downloadImg?path=${encodeURIComponent(item.emojiUrl)}`}
                           />
                         );

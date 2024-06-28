@@ -12,9 +12,12 @@ export async function decrypt(params: DecryptParams,options?: { [key: string]: a
   });
 }
 
-export async function queryWeChat(options?: { [key: string]: any }) {
-  return request<Response<WeChat[]>>('/api/database/queryWeChat', {
+export async function getDatabase(params: DatabaseParams,options?: { [key: string]: any }) {
+  return request<Response<DatabaseItem[]>>('/api/database/getDatabase', {
     method: 'GET',
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

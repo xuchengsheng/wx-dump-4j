@@ -7,7 +7,8 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import React from 'react';
-import useUserData from './pages/useUserData';
+import { useState, useEffect } from 'react';
+import { getAvatar } from '@/services/User';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -23,7 +24,22 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
 
-  const { avatarUrl } = useUserData();
+  const [avatarUrl, setAvatarUrl] = useState<string>();
+
+  const handleAvatar = async () => {
+    try {
+      const response = await getAvatar();
+      if (response.success) {
+        setAvatarUrl(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    handleAvatar();
+  }, []);
 
   return {
     actionsRender: () => [<Github />],

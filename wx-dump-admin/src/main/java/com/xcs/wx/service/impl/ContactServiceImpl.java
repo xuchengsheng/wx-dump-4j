@@ -9,10 +9,11 @@ import com.xcs.wx.mapping.ContactLabelMapping;
 import com.xcs.wx.repository.ContactLabelRepository;
 import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.service.ContactService;
+import com.xcs.wx.util.DirUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.FileSystems;
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,19 +70,15 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public String exportContact() {
-        // 分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
-        String filePath = System.getProperty("user.dir") + separator + "data" + separator + "export";
+        String filePath = DirUtil.getExportDir("微信好友.xlsx");
         // 创建文件
-        FileUtil.mkdir(filePath);
-        // 文件路径+文件名
-        String pathName = filePath + separator + "微信好友" + ".xlsx";
+        FileUtil.mkdir(new File(filePath).getParent());
         // 导出
-        EasyExcel.write(pathName, ExportContactVO.class)
+        EasyExcel.write(filePath, ExportContactVO.class)
                 .sheet("sheet1")
                 .doWrite(contactRepository::exportContact);
         // 返回写入后的文件
-        return pathName;
+        return filePath;
     }
 }

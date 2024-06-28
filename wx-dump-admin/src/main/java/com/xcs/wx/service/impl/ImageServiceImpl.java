@@ -47,7 +47,7 @@ public class ImageServiceImpl implements ImageService {
             // 获取用户信息
             String wxId = userService.currentUser();
             // 获得文件目录
-            String filePath = DirUtil.getImgDir(userService.getBasePath(wxId), wxId, imgUrl);
+            String filePath = DirUtil.getDir(userService.getBasePath(wxId), wxId, imgUrl);
             // 检查文件是否存在
             if (!FileUtil.exist(filePath)) {
                 return ResponseEntity.notFound().build();
@@ -84,8 +84,8 @@ public class ImageServiceImpl implements ImageService {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(new InputStreamResource(Files.newInputStream(Paths.get(destPath))));
-        } catch (Exception e) {
-            log.error("downloadImg error", e);
+        } catch (Exception ignore) {
+            // 忽略异常
         }
         // 默认返回404
         return ResponseEntity.notFound().build();
@@ -97,7 +97,7 @@ public class ImageServiceImpl implements ImageService {
             // 获取用户信息
             String wxId = userService.currentUser();
             // 获得文件目录
-            String filePath = DirUtil.getImgDir(userService.getBasePath(wxId), wxId, localPath);
+            String filePath = DirUtil.getDir(userService.getBasePath(wxId), wxId, localPath);
             // 检查文件是否存在，返回404
             if (!FileUtil.exist(filePath)) {
                 return ResponseEntity.notFound().build();

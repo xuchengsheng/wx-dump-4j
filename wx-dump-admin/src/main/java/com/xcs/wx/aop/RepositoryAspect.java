@@ -1,10 +1,9 @@
 package com.xcs.wx.aop;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
-import com.xcs.wx.service.UserService;
+import com.xcs.wx.util.DSNameUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,7 +31,7 @@ public class RepositoryAspect {
             DS dsAnnotation = AnnotationUtil.getAnnotation(targetClass, DS.class);
             // 有指定的注解
             if (dsAnnotation != null) {
-                DynamicDataSourceContextHolder.push(SpringUtil.getBean(UserService.class).currentUser() + "#" + dsAnnotation.value());
+                DynamicDataSourceContextHolder.push(DSNameUtil.getDSName(dsAnnotation.value()));
             }
             return joinPoint.proceed();
         } finally {

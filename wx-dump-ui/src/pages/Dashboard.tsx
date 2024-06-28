@@ -28,7 +28,7 @@ export default () => {
         }}
       >
         <Col xl={12} lg={24} md={24} sm={24} xs={24}>
-          <Card title="消息类别占比">
+          <Card title="过去15天内消息类别占比">
             <MsgCategory />
           </Card>
         </Col>

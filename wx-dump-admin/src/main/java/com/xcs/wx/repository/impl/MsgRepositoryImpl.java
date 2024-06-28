@@ -64,20 +64,14 @@ public class MsgRepositoryImpl extends ServiceImpl<MsgMapper, Msg> implements Ms
 
     @Override
     public List<MsgTypeDistributionVO> msgTypeDistribution() {
-        List<String> msgDbList = DataSourceType.getMsgDb();
-        Map<String, MsgTypeDistributionVO> countRecentMsgsMap = new HashMap<>();
-
-        for (String poolName : msgDbList) {
-            DynamicDataSourceContextHolder.push(poolName);
+        Optional<String> poolNameOptional = DataSourceType.getMsgDb().stream().max(Comparator.naturalOrder());
+        if (poolNameOptional.isPresent()) {
+            DynamicDataSourceContextHolder.push(poolNameOptional.get());
             List<MsgTypeDistributionVO> currentMsgsList = super.getBaseMapper().msgTypeDistribution();
             DynamicDataSourceContextHolder.clear();
-
-            currentMsgsList.forEach(msg -> countRecentMsgsMap.merge(msg.getType(), msg, (existing, newMsg) -> {
-                existing.setValue(existing.getValue() + newMsg.getValue());
-                return existing;
-            }));
+            return currentMsgsList;
         }
-        return new ArrayList<>(countRecentMsgsMap.values());
+        return Collections.emptyList();
     }
 
     @Override

@@ -176,7 +176,7 @@ const Contact: React.FC = () => {
             icon={<DownloadOutlined/>}
             type="primary"
           >
-            导出联系人
+            导出
           </Button>,
         ]}
       />

@@ -184,7 +184,7 @@ interface CardLink {
   url: string;
 }
 
-interface WeChat {
+interface WeChatConfig {
   pid: number;
   baseAddress: number;
   version: string;
@@ -248,3 +248,21 @@ interface UserItem {
 type SwitchUserParams = {
   wxId?: string;
 };
+
+type DatabaseParams = {
+  wxId?: string;
+};
+
+interface DatabaseItem {
+  filePath: string;
+  fileSize: string;
+}
+
+interface UserInfo {
+  basePath: string;
+  wxId: string;
+  nickname: string;
+  version: string;
+  account: string;
+  mobile: string;
+}

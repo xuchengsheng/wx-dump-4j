@@ -2,10 +2,9 @@ package com.xcs.wx.controller;
 
 import cn.hutool.system.SystemUtil;
 import com.xcs.wx.domain.dto.DecryptDTO;
+import com.xcs.wx.domain.vo.DatabaseVO;
 import com.xcs.wx.domain.vo.ResponseVO;
-import com.xcs.wx.domain.vo.WeChatConfigVO;
 import com.xcs.wx.service.DatabaseService;
-import com.xcs.wx.service.WeChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ import java.util.List;
 public class DatabaseController {
 
     private final DatabaseService databaseService;
-    private final WeChatService weChatService;
 
     /**
      * 数据库解密
@@ -43,12 +41,13 @@ public class DatabaseController {
             // 读取JDK版本号
             if (SystemUtil.getJavaInfo().getVersionInt() < 1100) {
                 try {
-                    emitter.send(ResponseVO.error(-1, "微信解密必须要求JDK11以上版本,请更换JDK版本。"),MediaType.APPLICATION_JSON);
+                    emitter.send(ResponseVO.error(-1, "微信解密必须要求JDK11以上版本,请更换JDK版本。"), MediaType.APPLICATION_JSON);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                }finally {
+                } finally {
                     emitter.complete();
                 }
+                return;
             }
             databaseService.decrypt(emitter, decryptDTO);
         }).start();
@@ -57,12 +56,12 @@ public class DatabaseController {
     }
 
     /**
-     * 查询微信信息
+     * 数据库解密
      *
      * @return ResponseVO
      */
-    @GetMapping("/queryWeChat")
-    public ResponseVO<List<WeChatConfigVO>> queryWeChat() {
-        return ResponseVO.ok(weChatService.readWeChatConfig());
+    @GetMapping("/getDatabase")
+    public ResponseVO<List<DatabaseVO>> decrypt(String wxId) {
+        return ResponseVO.ok(databaseService.getDatabase(wxId));
     }
 }

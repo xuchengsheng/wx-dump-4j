@@ -2,6 +2,20 @@
 /* eslint-disable */
 import { request } from 'umi';
 
+export async function readWeChatConfig(options?: { [key: string]: any }) {
+  return request<Response<WeChatConfig[]>>('/api/user/readWeChatConfig', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function getUserInfo(options?: { [key: string]: any }) {
+  return request<Response<UserInfo>>('/api/user/userInfo', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 export async function getAvatar(options?: { [key: string]: any }) {
   return request<Response<string>>('/api/user/avatar', {
     method: 'GET',
@@ -16,8 +30,8 @@ export async function getNickname(options?: { [key: string]: any }) {
   });
 }
 
-export async function getAllUser(options?: { [key: string]: any }) {
-  return request<Response<UserItem[]>>('/api/user/allUser', {
+export async function getUsers(options?: { [key: string]: any }) {
+  return request<Response<UserItem[]>>('/api/user/users', {
     method: 'GET',
     ...(options || {}),
   });

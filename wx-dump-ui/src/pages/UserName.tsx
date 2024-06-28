@@ -1,11 +1,27 @@
 import { Typography } from 'antd';
 import React from 'react';
-import useUserData from './useUserData';
+import { getNickname } from '@/services/User';
+import { useState, useEffect } from 'react';
 
 const { Text } = Typography;
 
 const UserName: React.FC = () => {
-  const { nickname } = useUserData();
+  const [nickname, setNickname] = useState<string>();
+
+  const handleNickname = async () => {
+    try {
+      const response = await getNickname();
+      if (response.success) {
+        setNickname(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    handleNickname();
+  }, []);
 
   return <Text>{nickname}</Text>;
 };

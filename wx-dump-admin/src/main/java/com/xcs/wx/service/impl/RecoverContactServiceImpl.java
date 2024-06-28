@@ -9,11 +9,12 @@ import com.xcs.wx.mapping.RecoverContactMapping;
 import com.xcs.wx.repository.ContactRepository;
 import com.xcs.wx.repository.FTSContactContentRepository;
 import com.xcs.wx.service.RecoverContactService;
+import com.xcs.wx.util.DirUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.FileSystems;
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,19 +46,15 @@ public class RecoverContactServiceImpl implements RecoverContactService {
 
     @Override
     public String exportRecoverContact() {
-        // 分隔符
-        String separator = FileSystems.getDefault().getSeparator();
         // 文件路径
-        String filePath = System.getProperty("user.dir") + separator + "data" + separator + "export";
+        String filePath = DirUtil.getExportDir("已删除好友.xlsx");
         // 创建文件
-        FileUtil.mkdir(filePath);
-        // 文件路径+文件名
-        String pathName = filePath + separator + "已删除好友" + ".xlsx";
+        FileUtil.mkdir(new File(filePath).getParent());
         // 导出
-        EasyExcel.write(pathName, RecoverContactVO.class)
+        EasyExcel.write(filePath, RecoverContactVO.class)
                 .sheet("sheet1")
                 .doWrite(() -> queryRecoverContact(new RecoverContactDTO()));
         // 返回写入后的文件
-        return pathName;
+        return filePath;
     }
 }

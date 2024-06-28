@@ -190,7 +190,7 @@ const ChatRoom: React.FC = () => {
             type="primary"
             onClick={() => setIsChatRoomExportOpen(true)}
           >
-            导出群聊
+            导出
           </Button>,
         ]}
       />

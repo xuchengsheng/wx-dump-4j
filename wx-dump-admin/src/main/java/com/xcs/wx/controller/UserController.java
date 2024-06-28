@@ -1,8 +1,11 @@
 package com.xcs.wx.controller;
 
+import com.xcs.wx.domain.vo.UserInfoVO;
 import com.xcs.wx.domain.vo.UserVO;
 import com.xcs.wx.domain.vo.ResponseVO;
+import com.xcs.wx.domain.vo.WeChatConfigVO;
 import com.xcs.wx.service.UserService;
+import com.xcs.wx.service.WeChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +27,27 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final WeChatService weChatService;
+
+    /**
+     * 查询微信信息
+     *
+     * @return ResponseVO
+     */
+    @GetMapping("/readWeChatConfig")
+    public ResponseVO<List<WeChatConfigVO>> readWeChatConfig() {
+        return ResponseVO.ok(weChatService.readWeChatConfig());
+    }
+
+    /**
+     * 用户头像
+     *
+     * @return ResponseVO
+     */
+    @GetMapping("/userInfo")
+    public ResponseVO<UserInfoVO> userInfo() {
+        return ResponseVO.ok(userService.userInfo());
+    }
 
     /**
      * 用户头像
@@ -50,9 +74,9 @@ public class UserController {
      *
      * @return ResponseVO
      */
-    @GetMapping("/allUser")
-    public ResponseVO<List<UserVO>> allUser() {
-        return ResponseVO.ok(userService.allUser());
+    @GetMapping("/users")
+    public ResponseVO<List<UserVO>> users() {
+        return ResponseVO.ok(userService.users());
     }
 
     /**
