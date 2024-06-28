@@ -80,7 +80,7 @@
 
 #### 安装包方式部署
 
-- 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.0.0/wx-dump-4j-bin.tar.gz)
+- 点击下载 [wx-dump-4j-bin.tar.gz](https://github.com/xuchengsheng/wx-dump-4j/releases/download/v1.1.0/wx-dump-4j-bin.tar.gz)
 
 - 解压缩 `wx-dump-4j-bin.tar.gz`，进入 bin 目录
 
