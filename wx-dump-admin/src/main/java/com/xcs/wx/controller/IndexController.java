@@ -17,9 +17,7 @@ public class IndexController {
      *
      * @return html
      */
-    @RequestMapping(value = {
-            "/"
-    })
+    @RequestMapping(value = "/{path:[^.]*}")
     public String index() {
         return "index";
     }
