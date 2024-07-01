@@ -48,4 +48,13 @@ public class ExceptionAdviceConfig {
         log.error("runtime exception", e);
         return ResponseVO.error(-1, "系统异常");
     }
+
+    /**
+     * 捕获Exception异常
+     **/
+    @ExceptionHandler(Exception.class)
+    public ResponseVO<String> handleException(Exception e) {
+        log.error("exception", e);
+        return ResponseVO.error(-1, "系统异常");
+    }
 }
