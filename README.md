@@ -151,8 +151,8 @@ wx-dump-4j是一款基于Java开发的微信数据分析工具。它准确显示
 
 作者晚上还要写博客✍️,平时还需要工作💼,如果帮到了你可以请作者吃个盒饭🥡
 <div>
-<img alt="logo" src="image/WeChatPay.png" style="width: 260px;height: 280px">
-<img alt="logo" src="image/Alipay.png" style="width: 260px;height: 280px">
+<img alt="logo" src="image/WeChatPay.png" style="width: 240px;height: 260px">
+<img alt="logo" src="image/Alipay.png" style="width: 240px;height: 260px">
 </div>
 
 ## ⭐️扫码关注微信公众号
@@ -162,7 +162,7 @@ wx-dump-4j是一款基于Java开发的微信数据分析工具。它准确显示
 在此，我们真诚地邀请您访问我们的GitHub项目页面，如果您觉得***wx-dump-4j***对您有帮助，请顺手点个⭐️**Star**⭐️！每一颗星星都是我们前进的动力，是对我们努力的最大肯定。非常感谢您的支持！
 
 <div>
-<img alt="logo" src="image/wechat-mp.png" height="200px">>
+<img alt="logo" src="image/wechat-mp.png" height="180px">>
 </div>
 
 ## 👀 演示图
