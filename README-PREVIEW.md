@@ -169,23 +169,23 @@ wx-dump-4j是一款基于Java开发的微信数据分析工具。它准确显示
 
 <table>
     <tr>
-        <td><img src="../image/screenshot/仪表台.png"/></td>
-        <td><img src="../image/screenshot/会话管理.png"/></td>
+        <td><img src="../image/screenshot/dashboard.png"/></td>
+        <td><img src="../image/screenshot/session.png"/></td>
     </tr>
     <tr>
-        <td><img src="../image/screenshot/好友管理.png"/></td>
-        <td><img src="../image/screenshot/找回好友.png"/></td>
+        <td><img src="../image/screenshot/contact.png"/></td>
+        <td><img src="../image/screenshot/recover-contact.png"/></td>
     </tr>
     <tr>
-        <td><img src="../image/screenshot/朋友圈.png"/></td>
-        <td><img src="../image/screenshot/聊天.png"/></td>
+        <td><img src="../image/screenshot/feeds.png"/></td>
+        <td><img src="../image/screenshot/chat.png"/></td>
     </tr>
 	<tr>
-        <td><img src="../image/screenshot/群聊管理.png"/></td>
-        <td><img src="../image/screenshot/群聊详情.png"/></td>
+        <td><img src="../image/screenshot/chatroom.png"/></td>
+        <td><img src="../image/screenshot/chatroom-detail.png"/></td>
     </tr>	 
 	<tr>
-        <td><img src="../image/screenshot/解密工具.png"/></td>
-        <td><img src="../image/screenshot/数据库列表.png"/></td>
+        <td><img src="../image/screenshot/database.png"/></td>
+        <td><img src="../image/screenshot/database-list.png"/></td>
     </tr>
 </table>
