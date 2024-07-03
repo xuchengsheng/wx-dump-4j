@@ -55,6 +55,26 @@ public class WeChatServiceImpl implements WeChatService {
     private static final String MY_DOCUMENT = "MyDocument:";
 
     /**
+     * 注册表中 WeChat 的路径
+     */
+    private static final String WECHAT_REG_PATH = "Software\\Tencent\\WeChat";
+
+    /**
+     * 注册表键值名称
+     */
+    private static final String FILE_SAVE_PATH = "FileSavePath";
+
+    /**
+     * WeChat 文件夹名称
+     */
+    private static final String WECHAT_FILES_DIR = "\\WeChat Files";
+
+    /**
+     * WeChat 配置文件的路径
+     */
+    private static final String CONFIG_FILE_PATH = "\\AppData\\Roaming\\Tencent\\WeChat\\All Users\\config\\3ebffe94.ini";
+
+    /**
      * 微信内存地址偏移量配置
      */
     private final WeChatOffsetProperties weChatOffsetConfig;
@@ -514,48 +534,55 @@ public class WeChatServiceImpl implements WeChatService {
      *
      * @return 微信文件目录
      */
-    private String getBasePath() {
-        // 准备一个数组来存储用户主目录的路径
-        char[] userHomePath = new char[WinDef.MAX_PATH];
+    public String getBasePath() {
+        // 默认微信文件路径设为 "MyDocument:"
+        String wechatDir = MY_DOCUMENT;
 
-        // 使用 Shell32 库的 SHGetFolderPath 方法获取用户主目录路径
-        // 如果调用失败，则返回 null
-        if (Shell32.INSTANCE.SHGetFolderPath(null, ShlObj.CSIDL_PROFILE, null, ShlObj.SHGFP_TYPE_CURRENT, userHomePath).intValue() == WinError.S_FALSE.intValue()) {
-            return null;
-        }
+        // 尝试从注册表读取 WeChat 的文件保存路径
+        if (Advapi32Util.registryKeyExists(WinReg.HKEY_CURRENT_USER, WECHAT_REG_PATH)) {
+            // 如果成功读取，设置 wechatDir 为读取的路径
+            wechatDir = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, WECHAT_REG_PATH, FILE_SAVE_PATH);
+        }else{
+            // 如果从注册表读取失败，尝试从配置文件读取
+            try {
+                // 获取用户主目录
+                String userProfile = System.getenv("USERPROFILE");
+                // 拼接 WeChat 配置文件的完整路径
+                String configPath = userProfile + CONFIG_FILE_PATH;
+                // 读取配置文件的所有行
+                List<String> lines = Files.readAllLines(Paths.get(configPath));
 
-        // 构建微信配置文件的路径
-        String iniFilePath = Native.toString(userHomePath) + "\\AppData\\Roaming\\Tencent\\WeChat\\All Users\\config\\3ebffe94.ini";
-
-        try {
-            // 读取配置文件中的第一行
-            List<String> lines = Files.readAllLines(Paths.get(iniFilePath));
-
-            // 如果文件为空，返回 null
-            if (lines.isEmpty()) {
-                return null;
-            }
-
-            // 获取文件中的文本内容
-            String txt = lines.get(0);
-
-            // 如果内容为 "MyDocument:"，则获取文档目录
-            if (MY_DOCUMENT.equals(txt)) {
-                char[] documentsPath = new char[WinDef.MAX_PATH];
-                // 再次使用 SHGetFolderPath 方法获取文档目录路径
-                if (Shell32.INSTANCE.SHGetFolderPath(null, ShlObj.CSIDL_PERSONAL, null, ShlObj.SHGFP_TYPE_CURRENT, documentsPath).intValue() == WinError.S_OK.intValue()) {
-                    // 返回微信文件夹的完整路径
-                    return Native.toString(documentsPath) + "\\WeChat Files";
+                if (!lines.isEmpty()) {
+                    // 如果文件不为空，设置 wechatDir 为读取的第一行内容
+                    wechatDir = lines.get(0);
                 }
-            } else {
-                // 如果内容不是 "MyDocument:"，则使用读取的路径
-                return txt + "\\WeChat Files";
+            } catch (IOException e) {
+                // 如果读取失败，设路径为 "MyDocument:"
+                wechatDir = MY_DOCUMENT;
             }
-        } catch (IOException e) {
-            log.error("Failed to obtain WeChat directory", e);
         }
-        // 如果无法获取路径，则返回 null
-        return null;
+        // 如果路径为 "MyDocument:"，尝试设置为Documents目录
+        if (MY_DOCUMENT.equals(wechatDir)) {
+            try {
+                // 获取文档目录路径
+                char[] documentsPath = new char[WinDef.MAX_PATH];
+                // 尝试获取文档目录路径
+                int documentsPathSuccess = Shell32.INSTANCE.SHGetFolderPath(null, ShlObj.CSIDL_PERSONAL, null, ShlObj.SHGFP_TYPE_CURRENT, documentsPath).intValue();
+                // 如果成功获取文档目录路径
+                if (documentsPathSuccess == WinError.S_OK.intValue()) {
+                    // 成功获取文档目录路径后，设置 wechatDir 为文档目录路径
+                    wechatDir = Native.toString(documentsPath);
+                } else {
+                    // 如果获取失败，设置路径为用户主目录下的 "Documents"
+                    wechatDir = System.getenv("USERPROFILE") + "\\Documents";
+                }
+            } catch (Exception e) {
+                // 如果获取失败，设置路径为用户主目录下的 "Documents"
+                wechatDir = System.getenv("USERPROFILE") + "\\Documents";
+            }
+        }
+        // 拼接 WeChat 文件目录路径
+        return wechatDir + WECHAT_FILES_DIR;
     }
 
     /**

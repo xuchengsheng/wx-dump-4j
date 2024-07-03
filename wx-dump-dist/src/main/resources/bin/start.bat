@@ -4,9 +4,9 @@ setlocal enabledelayedexpansion
 
 java -version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo 未检测到 Java 环境，请先安装 Java。
-    echo 您可以访问 https://repo.huaweicloud.com/java/jdk/11.0.2+9/jdk-11.0.2_windows-x64_bin.exe 下载并安装。
-    echo 安装完成后，请重新运行此脚本。
+    echo "未检测到 Java 环境，请先安装 Java。"
+    echo "您可以访问 https://repo.huaweicloud.com/java/jdk/11.0.2+9/jdk-11.0.2_windows-x64_bin.exe 下载并安装。"
+    echo "安装完成后，请重新运行此脚本。"
     pause
     exit /b
 )
