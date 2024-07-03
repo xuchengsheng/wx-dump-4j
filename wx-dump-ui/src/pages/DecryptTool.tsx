@@ -61,7 +61,7 @@ const DecryptTool: React.FC = () => {
           setDecryptingIds((prev) => ({ ...prev, [record.pid]: false }));
         }
       } else {
-        message.error(data.message);
+        message.error(data.errorMessage);
         setDecryptingIds((prev) => ({ ...prev, [record.pid]: false }));
       }
     };
