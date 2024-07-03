@@ -306,11 +306,11 @@ public class WeChatServiceImpl implements WeChatService {
             typeAddress = typeAddress2;
         } else if (typeAddress3.size() >= 2) {
             typeAddress = typeAddress3;
-        }else if (!typeAddress1.isEmpty()){
+        } else if (!typeAddress1.isEmpty()) {
             typeAddress = typeAddress1;
-        }else if (!typeAddress2.isEmpty()){
+        } else if (!typeAddress2.isEmpty()) {
             typeAddress = typeAddress2;
-        }else if (!typeAddress3.isEmpty()){
+        } else if (!typeAddress3.isEmpty()) {
             typeAddress = typeAddress3;
         }
 
@@ -546,7 +546,7 @@ public class WeChatServiceImpl implements WeChatService {
         // 是否读取成功的标记
         boolean readSuccess = false;
 
-        try{
+        try {
             // 尝试从注册表读取 WeChat 的文件保存路径
             if (Advapi32Util.registryKeyExists(WinReg.HKEY_CURRENT_USER, WECHAT_REG_PATH)) {
                 // 如果成功读取，设置 wechatDir 为读取的路径
@@ -554,7 +554,7 @@ public class WeChatServiceImpl implements WeChatService {
                 // 标记为读取成功
                 readSuccess = true;
             }
-        }catch (Exception ignore){
+        } catch (Exception ignore) {
             // 如果读取失败，设路径为 "MyDocument:"
             wechatDir = MY_DOCUMENT;
         }
@@ -562,7 +562,7 @@ public class WeChatServiceImpl implements WeChatService {
 
         // 如果从注册表读取失败，尝试从配置文件读取
         try {
-            if (readSuccess){
+            if (!readSuccess) {
                 // 获取用户主目录
                 String userProfile = System.getenv("USERPROFILE");
                 // 拼接 WeChat 配置文件的完整路径
