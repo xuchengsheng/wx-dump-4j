@@ -299,12 +299,18 @@ public class WeChatServiceImpl implements WeChatService {
         List<Pointer> typeAddress2 = patternScanModule(process, androidByteArray);
         List<Pointer> typeAddress3 = patternScanModule(process, ipadByteArray);
 
-        // 根据扫描结果确定选择哪种平台的模块地址
+        // 优先选择长度至少为2的模块地址列表
         if (typeAddress1.size() >= 2) {
             typeAddress = typeAddress1;
         } else if (typeAddress2.size() >= 2) {
             typeAddress = typeAddress2;
         } else if (typeAddress3.size() >= 2) {
+            typeAddress = typeAddress3;
+        }else if (!typeAddress1.isEmpty()){
+            typeAddress = typeAddress1;
+        }else if (!typeAddress2.isEmpty()){
+            typeAddress = typeAddress2;
+        }else if (!typeAddress3.isEmpty()){
             typeAddress = typeAddress3;
         }
 
