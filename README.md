@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+	<a href="https://hellogithub.com/repository/5055dcceee434dc5851ac9897cb27396" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=5055dcceee434dc5851ac9897cb27396&claim_uid=AVv4KeNnZs2Ig3a" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</p>
+
+<p align="center">
 	<a href="https://github.com/xuchengsheng/spring-reading/stargazers"><img src="https://img.shields.io/github/stars/xuchengsheng/wx-dump-4j?logo=github&logoColor=%23EF2D5E&label=Stars&labelColor=%23000000&color=%23EF2D5E&cacheSeconds=3600" alt="Stars Badge"/></a>
     <a href="https://github.com/xuchengsheng"><img src="https://img.shields.io/github/followers/xuchengsheng?label=Followers&logo=github&logoColor=%23FC521F&labelColor=%231A2477&color=%23FC521F&cacheSeconds=3600" alt="Follow Badge"></a>
     <a href="https://github.com/xuchengsheng/wx-dump-4j/fork"><img src="https://img.shields.io/github/forks/xuchengsheng/wx-dump-4j?label=Forks&logo=github&logoColor=%23F2BB13&labelColor=%23BE2323&color=%23F2BB13" alt="Fork Badge"></a>
