@@ -50,10 +50,14 @@ wechat-offset:
       nickname: 93550296
       account: 93550072
       mobile: 93550104
+    "[3.9.11.23]":
+      nickname: 93701208
+      account: 93700984
+      mobile: 93701016
 mybatis-plus:
   global-config:
     banner: off
-  #configuration:
+    #configuration:
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
 logging:
   level:
