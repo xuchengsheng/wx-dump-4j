@@ -2,7 +2,7 @@ import { queryFeeds } from '@/services/Feeds';
 import { queryAllContact } from '@/services/Contact';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { PageContainer, ProList } from '@ant-design/pro-components';
-import { Avatar, Col, Flex, Image, Row, Typography,Alert } from 'antd';
+import {Avatar, Col, Flex, Image, Row, Typography, Alert, Select} from 'antd';
 import React from 'react';
 import './Style/Feeds.less';
 import { useEffect, useState } from 'react';
@@ -72,9 +72,30 @@ const Feeds: React.FC = () => {
           },
           userName: {
             title: '用户名',
-            valueType: 'select',
             dataIndex: 'userName',
-            valueEnum: allContact,
+            renderFormItem: (_, { type, defaultRender, ...rest }, form) => {
+              if (type === 'form') {
+                return defaultRender(_);
+              }
+              return (
+                <Select
+                  showSearch
+                  allowClear={true}
+                  placeholder="请选择或输入用户名"
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                  {...rest}
+                >
+                  {Object.keys(allContact).map((key) => (
+                    <Select.Option key={key} value={key}>
+                      {allContact[key].text}
+                    </Select.Option>
+                  ))}
+                </Select>
+              );
+            },
           },
           strCreateTime:{
             title: '创建时间',
