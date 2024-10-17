@@ -4,6 +4,7 @@ import MsgCategory from './Components/MsgCategory';
 import RecentUsedKeyWord from './Components/RecentUsedKeyWord';
 import StatsPanel from './Components/StatsPanel';
 import TopContacts from './Components/TopContacts';
+import RecentGroupChats from './Components/RecentGroupChats';
 
 export default () => {
   return (
@@ -35,6 +36,11 @@ export default () => {
         <Col xl={12} lg={24} md={24} sm={24} xs={24}>
           <Card title="最近使用的关键字">
             <RecentUsedKeyWord />
+          </Card>
+        </Col>
+        <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+          <Card title="最近使用频繁的群聊">
+            <RecentGroupChats /> 
           </Card>
         </Col>
       </Row>

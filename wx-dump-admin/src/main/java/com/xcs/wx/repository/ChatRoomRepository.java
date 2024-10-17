@@ -45,4 +45,18 @@ public interface ChatRoomRepository {
      * @return ExportChatRoomVO
      */
     List<ExportChatRoomVO> exportChatRoom();
+
+    /**
+     * 查询最近5天内消息最频繁的前5个群聊
+     *
+     * @return 群聊名称和消息数量
+     */
+    @Query(value = "SELECT gc.name, COUNT(m.id) AS message_count " +
+                   "FROM group_chat gc " +
+                   "JOIN message m ON gc.id = m.chat_id " +
+                   "WHERE m.timestamp >= CURRENT_DATE - INTERVAL 5 DAY " +
+                   "GROUP BY gc.id, gc.name " +
+                   "ORDER BY message_count DESC " +
+                   "LIMIT 5", nativeQuery = true)
+    List<Object[]> findTopGroupChatsLast5Days();
 }

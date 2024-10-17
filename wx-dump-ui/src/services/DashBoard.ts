@@ -36,3 +36,10 @@ export async function queryRecentUsedKeyWord(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+export async function getTopGroupChatsLast5Days(options?: { [key: string]: any }) {
+  return request<Response<TopGroupChatsItem[]>>('/api/dashboard/getTopGroupChatsLast5Days', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}

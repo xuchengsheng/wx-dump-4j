@@ -71,4 +71,14 @@ public class DashboardController {
     public ResponseVO<List<RecentUsedKeyWordVO>> queryRecentUsedKeyWord() {
         return ResponseVO.ok(dashBoardService.queryRecentUsedKeyWord());
     }
+
+    /**
+     * 最近5天内使用最频繁的5个群聊
+     *
+     * @return ResponseVO
+     */
+    @GetMapping("/topGroupChatsLast5Days")
+    public ResponseVO<List<TopGroupChatsVO>> getTopGroupChatsLast5Days() {
+        return ResponseVO.ok(dashBoardService.getTopGroupChatsLast5Days());
+    }
 }

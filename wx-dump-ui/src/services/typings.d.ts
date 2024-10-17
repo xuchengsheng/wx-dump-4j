@@ -266,3 +266,8 @@ interface UserInfo {
   account: string;
   mobile: string;
 }
+
+interface TopGroupChatsItem {
+  name: string; // 群聊名称
+  messageCount: number; // 消息数量
+}

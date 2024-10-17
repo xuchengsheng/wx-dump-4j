@@ -93,4 +93,16 @@ public class DashboardServiceImpl implements DashboardService {
                 .map(RecentUsedKeyWordVO::new)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<TopGroupChatsVO> getTopGroupChatsLast5Days() {
+        // 获取最近5天的群聊消息数量统计
+        List<Object[]> results = chatRoomRepository.findTopGroupChatsLast5Days();
+        
+        // 将查询结果转换为TopGroupChatsVO对象列表
+        return results.stream()
+                .map(result -> new TopGroupChatsVO((String) result[0], ((Number) result[1]).intValue()))
+                .collect(Collectors.toList());
+    }
+
 }

@@ -46,4 +46,10 @@ public interface DashboardService {
      * @return 返回关键字
      */
     List<RecentUsedKeyWordVO> queryRecentUsedKeyWord();
+    /**
+     * 查询最近使用的群聊
+     *
+     * @return 返回群聊
+     */
+    List<TopGroupChatsVO> getTopGroupChatsLast5Days();
 }
