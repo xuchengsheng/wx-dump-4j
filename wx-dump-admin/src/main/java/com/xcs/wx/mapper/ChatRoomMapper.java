@@ -40,4 +40,11 @@ public interface ChatRoomMapper extends BaseMapper<ChatRoom> {
      * @return ExportChatRoomVO
      */
     List<ExportChatRoomVO> exportChatRoom();
+
+     /**
+     * 查询最近一个月内互动最频繁的前10个群聊
+     *
+     * @return List<TopGroupChatsVO>
+     */
+    List<TopGroupChatsVO> findTopGroupChats();
 }
