@@ -63,6 +63,16 @@ public class DashboardController {
     }
 
     /**
+     * 最近一个月内微信互动最频繁的前10个群聊
+     *
+     * @return ResponseVO
+     */
+    @GetMapping("/topGroupChats")
+    public ResponseVO<List<TopGroupChatsVO>> topGroupChats() {
+        return ResponseVO.ok(dashBoardService.topGroupChats());
+    }
+
+    /**
      * 查询最近使用的关键字
      *
      * @return ResponseVO
