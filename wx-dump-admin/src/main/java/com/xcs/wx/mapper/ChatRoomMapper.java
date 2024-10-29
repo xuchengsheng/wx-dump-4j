@@ -1,53 +1,53 @@
-package com.xcs.wx.repository.impl;
+package com.xcs.wx.mapper;
 
-import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xcs.wx.constant.DataSourceType;
 import com.xcs.wx.domain.ChatRoom;
 import com.xcs.wx.domain.dto.ChatRoomDTO;
 import com.xcs.wx.domain.vo.ChatRoomVO;
 import com.xcs.wx.domain.vo.ExportChatRoomVO;
 import com.xcs.wx.domain.vo.TopGroupChatsVO;
-import com.xcs.wx.mapper.ChatRoomMapper;
-import com.xcs.wx.repository.ChatRoomRepository;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 /**
- * 群聊 Repository 实现类
+ * 群聊 Mapper
  *
  * @author xcs
- * @date 2023年12月21日18:38:19
- */
-@Repository
-@DS(value = DataSourceType.MICRO_MSG_DB)
-public class ChatRoomRepositoryImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> implements ChatRoomRepository {
+ * @date 2024年01月08日 15时55分
+ **/
+public interface ChatRoomMapper extends BaseMapper<ChatRoom> {
 
-    @Override
-    public Page<ChatRoomVO> queryChatRoom(ChatRoomDTO chatRoomDTO) {
-        return getBaseMapper().queryChatRoom(new Page<>(chatRoomDTO.getCurrent(), chatRoomDTO.getPageSize()), chatRoomDTO);
-    }
+    /**
+     * 查询群聊
+     *
+     * @param page        分页信息
+     * @param chatRoomDTO 查询条件
+     * @return ChatRoomVO
+     */
+    Page<ChatRoomVO> queryChatRoom(Page<ChatRoomVO> page, @Param("chatRoomDTO") ChatRoomDTO chatRoomDTO);
 
-    @Override
-    public ChatRoom queryChatRoomDetail(String chatRoomName) {
-        return super.getById(chatRoomName);
-    }
+    /**
+     * 统计群聊数量
+     *
+     * @return 群聊总数
+     */
+    int countChatRoom();
 
-    @Override
-    public int countChatRoom() {
-        return getBaseMapper().countChatRoom();
-    }
+    /**
+     * 导出群聊
+     *
+     * @return ExportChatRoomVO
+     */
+    List<ExportChatRoomVO> exportChatRoom();
 
-    @Override
-    public List<ExportChatRoomVO> exportChatRoom() {
-        return getBaseMapper().exportChatRoom();
-    }
-
-    @Override
-    public List<TopGroupChatsVO> findTopGroupChats() {
-        return getBaseMapper().findTopGroupChats();
-    }
-
+    /**
+     * 查询最近一个月内互动最频繁的前10个群聊
+     *
+     * @return List<TopGroupChatsVO>
+     */
+    List<TopGroupChatsVO> findTopGroupChats();
 }
+
