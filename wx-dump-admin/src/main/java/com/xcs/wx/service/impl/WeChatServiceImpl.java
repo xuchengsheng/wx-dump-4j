@@ -857,15 +857,29 @@ public class WeChatServiceImpl implements WeChatService {
     }
 
     /**
-     * 去掉点比较版本号的方法
+     * 比较版本号的方法
      *
-     * @param supportMinVersion 支持的版本
+     * @param supportMinVersion 支持的最小版本
      * @param currentVersion    当前版本
      * @return true or false
      */
-    private boolean compareVersions(String supportMinVersion, String currentVersion) {
-        long supportMinVersionLong = Long.parseLong(supportMinVersion.replaceAll("\\.", ""));
-        long currentVersionLong = Long.parseLong(currentVersion.replaceAll("\\.", ""));
-        return currentVersionLong < supportMinVersionLong;
+    private static boolean compareVersions(String supportMinVersion, String currentVersion) {
+        String[] minParts = supportMinVersion.split("\\.");
+        String[] currentParts = currentVersion.split("\\.");
+
+        for (int i = 0; i < Math.max(minParts.length, currentParts.length); i++) {
+            int minPart = i < minParts.length ? Integer.parseInt(minParts[i]) : 0;
+            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+
+            if (currentPart < minPart) {
+                // 当前版本小于支持的最小版本
+                return true;
+            } else if (currentPart > minPart) {
+                // 当前版本大于支持的最小版本
+                return false;
+            }
+        }
+        // 版本相等
+        return false;
     }
 }
