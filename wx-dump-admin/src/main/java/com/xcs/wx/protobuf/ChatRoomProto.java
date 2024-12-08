@@ -291,31 +291,23 @@ public final class ChatRoomProto {
         }
 
         @Override
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                throws java.io.IOException {
-            for (int i = 0; i < members_.size(); i++) {
-                output.writeMessage(1, members_.get(i));
+        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+            for (Member member : members_) {
+                output.writeMessage(1, member);
             }
-            if (field2_ != 0) {
-                output.writeInt32(2, field2_);
+            int[] intFields = {field2_, field3_, field4_, roomCapacity_, field6_};
+            int[] intFieldNumbers = {2, 3, 4, 5, 6};
+            for (int i = 0; i < intFields.length; i++) {
+                if (intFields[i] != 0) {
+                    output.writeInt32(intFieldNumbers[i], intFields[i]);
+                }
             }
-            if (field3_ != 0) {
-                output.writeInt32(3, field3_);
-            }
-            if (field4_ != 0) {
-                output.writeInt32(4, field4_);
-            }
-            if (roomCapacity_ != 0) {
-                output.writeInt32(5, roomCapacity_);
-            }
-            if (field6_ != 0) {
-                output.writeInt32(6, field6_);
-            }
-            if (field7_ != 0L) {
-                output.writeInt64(7, field7_);
-            }
-            if (field8_ != 0L) {
-                output.writeInt64(8, field8_);
+            long[] longFields = {field7_, field8_};
+            int[] longFieldNumbers = {7, 8};
+            for (int i = 0; i < longFields.length; i++) {
+                if (longFields[i] != 0L) {
+                    output.writeInt64(longFieldNumbers[i], longFields[i]);
+                }
             }
             getUnknownFields().writeTo(output);
         }
@@ -324,45 +316,30 @@ public final class ChatRoomProto {
         public int getSerializedSize() {
             int size = memoizedSize;
             if (size != -1) return size;
-
+        
             size = 0;
-            for (int i = 0; i < members_.size(); i++) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeMessageSize(1, members_.get(i));
+            for (Member member : members_) {
+                size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, member);
             }
-            if (field2_ != 0) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt32Size(2, field2_);
+            int[] intFields = {field2_, field3_, field4_, roomCapacity_, field6_};
+            int[] intFieldNumbers = {2, 3, 4, 5, 6};
+            for (int i = 0; i < intFields.length; i++) {
+                if (intFields[i] != 0) {
+                    size += com.google.protobuf.CodedOutputStream.computeInt32Size(intFieldNumbers[i], intFields[i]);
+                }
             }
-            if (field3_ != 0) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt32Size(3, field3_);
-            }
-            if (field4_ != 0) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt32Size(4, field4_);
-            }
-            if (roomCapacity_ != 0) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt32Size(5, roomCapacity_);
-            }
-            if (field6_ != 0) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt32Size(6, field6_);
-            }
-            if (field7_ != 0L) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt64Size(7, field7_);
-            }
-            if (field8_ != 0L) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt64Size(8, field8_);
+            long[] longFields = {field7_, field8_};
+            int[] longFieldNumbers = {7, 8};
+            for (int i = 0; i < longFields.length; i++) {
+                if (longFields[i] != 0L) {
+                    size += com.google.protobuf.CodedOutputStream.computeInt64Size(longFieldNumbers[i], longFields[i]);
+                }
             }
             size += getUnknownFields().getSerializedSize();
             memoizedSize = size;
             return size;
         }
-
+        
         @Override
         public boolean equals(final Object obj) {
             if (obj == this) {

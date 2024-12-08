@@ -88,12 +88,14 @@ wx-dump-4j是一款基于Java开发的微信数据分析工具。它准确显示
    ```
 - 安装后端依赖：
    ```bash
-   $ cd wx-dump-4j mvn clean install
+   $ cd wx-dump-4j
+   $ mvn clean install
    ```
 - 使用开发工具（如 IntelliJ IDEA）启动 com.xcs.wx.WxDumpApplication。
 - 安装前端依赖：
    ```bash
-   $ cd wx-dump-ui npm install
+   $ cd wx-dump-ui
+   $ npm install
    ```
 - 启动前端服务：
    ```bash
