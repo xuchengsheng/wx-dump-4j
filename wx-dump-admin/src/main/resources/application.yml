@@ -66,6 +66,10 @@ wechat-offset:
       nickname: 93834984
       account: 93834760
       mobile: 93834792
+    "[3.9.12.51]":
+      nickname: 94555176
+      account: 94556512
+      mobile: 94554984
 mybatis-plus:
   global-config:
     banner: off
@@ -77,4 +81,3 @@ logging:
     com.alibaba.druid.pool.DruidDataSource: WARN
     com.baomidou.dynamic.datasource.DynamicRoutingDataSource: WARN
     com.baomidou.dynamic.datasource.destroyer.DefaultDataSourceDestroyer: WARN
-
